@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>按钮宽度自适应</title>
+    <style>
+        /** 块级元素：div p h ul li ol dl dt dd hr form frameset table thead th tr tfoot 等***/
+        /**　行内元素：span em strong i a  img  input textarea  label  等，
+            行内元素定义宽高无效，margin上下无效，padding上下无效，line-height有效**/
+        .btn1{
+            display:inline-block;
+            background:url(../image/gray_btn.png) no-repeat left top;
+            padding-left:3px; color:#000000; font-size:12px; text-decoration:none;}
+        .btn1 cite{display:block; line-height:26px; padding:0 13px 0 10px; background:url(http://www.zhangxinxu.com/study/image/sina_gray_btn.png) no-repeat right top;}
+
+        .btn1{
+            float: left;
+            background:url(../image/gray_btn.png) no-repeat left top;
+            padding-left:3px; color:#000000; font-size:12px; text-decoration:none;}
+        .btn1 cite{display:block; line-height:26px; padding:0 13px 0 10px; background:url(http://www.zhangxinxu.com/study/image/sina_gray_btn.png) no-repeat right top;}
+
+    </style>
+</head>
+<body>
+<a href="javascript:void(0);" class="btn1"><cite>inline-block方法</cite></a>
+<ol style="width:440px;">
+    <li style="border:4px solid #ff6633; background:#ffffc0; float:left;"><img src="../image/crown.png" /></li>
+    <li style="border:4px solid #ff6633; background:#ffffc0;"><img src="../image/crown.png" /></li>
+</ol>
+<div>
+    Line1 <br/>
+    linw2 <br>
+    line3 <br>
+</div>
+<p>这是一行普通的文字，这里有个 <em>em</em> 标签。</p>
+<p style="width:50px;">这是一行普通的文字，这里有个 <img src="../image/gray_btn.png"/> 标签。</p>
+<ul style="list-style:none;margin-top:50px;">
+    <li>
+        <div class="left">
+            <span class="icon"></span>
+            <span class="headimg"><img src="../image/man.jpg" alt=""></span>
+        </div>
+            <div class="right">
+                <div class="top"><span class="level"><img src="../image/heart.png" alt=""><strong>88</strong></span><span style="padding-left:10px;">7878787878</span></div>
+                <div class="bottom">botttttttttttttttttttttttm</div>
+            </div>
+    </li>
+    <li>
+        <div class="left">
+            <span class="icon"></span>
+            <span class="headimg"><img src="../image/man.jpg" alt=""></span>
+        </div>
+        <div class="right">
+            <div class="top"><span class="level"><img src="../image/heart.png" alt=""><strong>88</strong></span><span style="padding-left:10px;">7878787878</span></div>
+            <div class="bottom">botttttttttttttttttttttttm</div>
+        </div>
+    </li>
+</ul>
+<style>
+    /*使用float有高度塌陷的问题   使用display:inline-block，需要注意元素间空格，会被识别为空文本。进而间距变大的问题，书写html时候要去掉空格，写在一块 */
+    /**
+    obj.style.cssFloat = 'left';
+    obj.style.styleFloat = 'left';
+    **/
+    /*清除浮动样式 --- 适用于高度坍塌的时候 ---- after+zoom方法 */
+    .fix{zoom:1;}
+    .fix:after{display: block;content:'';clear:both;visibility: hidden;height:0;}/*或者line-height:0 ;*/
+    ul{list-style: none;border:1px solid red;padding:50px;}
+    ul li{width: 200px;margin-bottom: 10px;background: #cecece; border-radius: 4px;}
+    .left{float:left;background: yellowgreen;width:75px;height:30px;border-radius: 4px;margin-right: 5px;}
+    .left .icon{float:left;width:23px;height:24px;background: url('../image/crown.png') no-repeat center;    margin-right: 13px;position:relative;left:-4px;}
+    .left .headimg{float:left;width:30px;height:30px;border-radius:50%;overflow: hidden;border:2px solid indianred;position: relative;top:-3px; }
+    .left .headimg img{width:30px;height: 30px;border-radius: 50%;}
+    .right{font-size: 12px;}
+    .top .level{float:left;background: indianred;border-radius: 4px;padding: 0 5px;}
+    .level img{float:left;margin-top:5px;}
+    .level strong{-webkit-text-size-adjust: none !important;-webkit-transform: scale(0.75);transform: scale(0.75);font-size: 12px;display: inline-block;padding-left: 5px;}
+    .bottom{width:100px;overflow: hidden;text-overflow: ellipsis;white-space: nowrap; }
+</style>
+</body>
+</html>

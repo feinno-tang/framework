@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+    <!----初始宽度为设备宽度 initial-scale=1 ,用户不可手动缩放，添加id属性，方便js操作 --->
+    <meta name="viewport" id="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
+    <!-----只对iOS设备，启动webapp功能，苹果添加到屏幕会生成图标，点击图标会以webapp方式运行（全屏）If content is set to yes, the web application runs in full-screen mode，默认是在safari中打开---->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <!----和上一个meta标签为一组配合，打开webapp功能才有效，规定了显示电池手机信号，时间的顶部导航栏颜色。default（白色），可以定为black（黑色）和black-translucent（灰色半透明）--->
+    <meta content="black" name="apple-mobile-web-app-status-bar-style" />
+    <!---- 格式检测  ，遇到一串数字，不识别为手机号（避免用户点击数字，就激活电话）-->
+    <meta name="format-detection" content="telephone=no">
+    <title>自适应</title>
+    <!---- 方法1： - 手机屏幕自适应  方法1： 按照设计稿的尺寸做（px）,然后根据实际尺寸除以设计稿尺寸得到一个倍数，设置initial-scale属性为这个倍数--->
+    <script>
+        // -- 匿名函数 自执行, 避免对函数内变量的引用，执行完毕即释放内存--->
+        (function(){
+            var scalar = 640, //假设设计稿尺寸按 640 设计   scalar:标量   英 ['skeɪlə]  美 [skelɚ]
+            scale = parseInt(window.screen.width) / scalar;
+            document.getElementById('viewport').setAttribute(
+                'content','target-densitydpi=device-dpi,width=635,use-scalable=no,initial-scale='+scale.toFixed(2));
+        })();
+    </script>
+    <!----方法2 ： 手机屏幕自适应  方法2： --->
+    <script>
+        // todo 方法2
+
+    </script>
+    <img id="pv" width="1" height="1" style="display:none;" />
+    <script type="text/javascript">
+        var FE_VERSION = 'v20160712';
+        var pjPath = 'http://' + location.host + '/git2017/framework/';
+        var DOMAIN_CONFIG = {
+            'IMAGE_DOMAIN': pjPath+'image/'
+        };
+        /**** ----只要刷页面就调一次统计pv - */
+        //document.getElementById('pv').src=DOMAIN_CONFIG['SITE_DOMAIN']+'user_pvReport.fly?t='+ (new Date).getTime();
+    </script>
+    <!---seajs 遵循的CMD规范 ---->
+    <!----requireJS 遵循的AMD规范 --->
+    <script type="text/javascript" src="js/reference/sea.js"></script>
+    <!----google统计代码 --->
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-57564405-1', 'auto');
+        ga('send', 'pageview');
+
+        !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+            n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+            n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+            t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+            document,'script','https://connect.facebook.net/en_US/fbevents.js');
+
+        fbq('init', '897105567032410');
+        fbq('track', "PageView");
+    </script>
+</head>
+<script>
+    function getData(){
+
+    }
+</script>
+</head>
+<body onload="getData()">
+    <div id="welcome"></div>
+    <div id="home"></div>
+</body>
+</html>

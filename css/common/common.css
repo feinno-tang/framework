@@ -1,0 +1,206 @@
+@font-face {
+    font-family: "Al-Jazeera-Arabic-Regular";
+    src: url("/git2017/framework/font/Al-Jazeera-Arabic-Regular.ttf");
+}
+/* ---------- RESET ------- */
+
+html,
+body,
+div,
+span,
+applet,
+object,
+iframe,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote,
+pre,
+a,
+abbr,
+acronym,
+address,
+big,
+cite,
+code,
+del,
+dfn,
+em,
+font,
+img,
+ins,
+kbd,
+q,
+s,
+samp,
+small,
+strike,
+strong,
+sub,
+sup,
+tt,
+var,
+dl,
+dt,
+dd,
+ol,
+ul,
+li,
+fieldset,
+form,
+label,
+legend,
+table,
+caption,
+tbody,
+tfoot,
+thead,
+tr,
+th,
+td {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    outline: 0;
+    direction: inherit;
+    font-weight: inherit;
+    font-style: inherit;
+    font-size: 100%;
+    font-family: "arial";
+    vertical-align: baseline;
+}
+
+.arabic div,
+.arabic span,
+.arabic applet,
+.arabic object,
+.arabic iframe,
+.arabic h1,
+.arabic h2,
+.arabic h3,
+.arabic h4,
+.arabic h5,
+.arabic h6,
+.arabic p,
+.arabic blockquote,
+.arabic pre,
+.arabic a,
+.arabic abbr,
+.arabic acronym,
+.arabic address,
+.arabic big,
+.arabic cite,
+.arabic code,
+.arabic del,
+.arabic dfn,
+.arabic em,
+.arabic font,
+.arabic img,
+.arabic ins,
+.arabic kbd,
+.arabic q,
+.arabic s,
+.arabic samp,
+.arabic small,
+.arabic strike,
+.arabic strong,
+.arabic sub,
+.arabic sup,
+.arabic tt,
+.arabic var,
+.arabic dl,
+.arabic dt,
+.arabic dd,
+.arabic ol,
+.arabic ul,
+.arabic li,
+.arabic fieldset,
+.arabic form,
+.arabic label,
+.arabic legend,
+.arabic table,
+.arabic caption,
+.arabic tbody,
+.arabic tfoot,
+.arabic thead,
+.arabic tr,
+.arabic th,
+.arabic td {
+    font-family: "Al-Jazeera-Arabic-Regular" !important ;
+}
+
+:focus {
+    outline: 0;
+}
+
+table {
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+caption,
+th,
+td {
+    text-align: left;
+    font-weight: normal;
+}
+
+img,
+a img {
+    border: none;
+    vertical-align: bottom;
+}
+
+a {
+    text-decoration: none;
+    color: #1a1a1a;
+}
+
+ol,
+ul {
+    list-style: none;
+}
+
+input,
+textarea,
+select,
+button {
+    font-size: 100%;
+    font-family: inherit;
+}
+
+select {
+    margin: inherit;
+}
+
+.clearfix:after {
+    content: ".";
+    display: block;
+    height: 0;
+    clear: both;
+    visibility: hidden;
+}
+
+.clearfix {
+    display: inline-block;
+}
+
+.hidden,
+.dis_none {
+    display: none !important;
+}
+
+
+/* Hides from IE-mac \*/
+
+*html .clearfix {
+    height: 1%;
+}
+
+.clearfix {
+    display: block;
+}

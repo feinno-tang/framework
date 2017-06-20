@@ -957,7 +957,7 @@
 (function() {
   var dataDomain = resourceDomain = pjPath ;
 function useCSSPage(page){
-   return 'css/' + page;
+   return 'css/page/' + page;
 }
 function useJSPage(page){
   return  'js/page/' + page;
@@ -978,10 +978,12 @@ function useJSPage(page){
     preload: location.pathname.indexOf('mobile')>-1 ? [
         'wheel/zepto.js',
         'wheel/jquery.js',
-        'common/utility.js'
+        'common/utility.js',
+        'cssCommon/common.css'
     ]:[
         'wheel/jquery.js',
-        'common/utility.js'
+        'common/utility.js',
+        'cssCommon/common.css'
     ],
     map: [ //模块路径进行映射修改，可用于路径转换、在线调试等
       [new RegExp(resourceDomain + '(.*\\.(?:css|js|properties))(?:.*)$'), resourceDomain + '$1?' + FE_VERSION],

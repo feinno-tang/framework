@@ -11,19 +11,18 @@
     <!---- 格式检测  ，遇到一串数字，不识别为手机号（避免用户点击数字，就激活电话）-->
     <meta name="format-detection" content="telephone=no">
     <title>自适应</title>
-    <!--- 总体上来说，可以利用百分比和flex布局，实现自适应 ，需要固定尺寸的，再用以下的自适应方法 ，配合使用，
-            对于一些元素，比如底部导航栏，一般用flex平均分配每个导航元素
-    --->
     <!---- 方法1： - 手机屏幕自适应  方法1： 按照设计稿的尺寸做（px）,然后根据实际尺寸除以设计稿尺寸得到一个倍数，设置initial-scale属性为这个倍数--->
-    <script>
-        // -- 匿名函数 自执行, 避免对函数内变量的引用，执行完毕即释放内存--->
-        (function(){
-            var scalar = 750, //假设设计稿尺寸按 640 设计   scalar:标量   英 ['skeɪlə]  美 [skelɚ]
-            scale = parseInt(window.screen.width) / scalar;
-            document.getElementById('viewport').setAttribute(
-                'content','target-densitydpi=device-dpi,width=750,user-scalable=no,initial-scale='+scale.toFixed(2)*1);
-        })();
-    </script>
+
+    <!----方法2 ： 手机屏幕自适应  方法2：阿里高清方案布局代码 ：放一段阿里的代码，代码会自动判断dpr,来设置html的font-size
+                   一般给的设计稿是640 或者750，对应的苹果设备为dpr:2   阿里代码默认设置的dpr是2，html根元素的font-size:100px
+                    可按照设计稿中1px->0.01rem来写样式。 添加代码后，无需再手动设置 viewport
+                    （注:不要手动设置viewport，该方案自动帮你设置）
+
+                    阿里代码如下：
+    -->
+
+    <script>!function(e){function t(a){if(i[a])return i[a].exports;var n=i[a]={exports:{},id:a,loaded:!1};return e[a].call(n.exports,n,n.exports,t),n.loaded=!0,n.exports}var i={};return t.m=e,t.c=i,t.p="",t(0)}([function(e,t){"use strict";Object.defineProperty(t,"__esModule",{value:!0});var i=window;t["default"]=i.flex=function(e,t){var a=e||100,n=t||1,r=i.document,o=navigator.userAgent,d=o.match(/Android[\S\s]+AppleWebkit\/(\d{3})/i),l=o.match(/U3\/((\d+|\.){5,})/i),c=l&&parseInt(l[1].split(".").join(""),10)>=80,p=navigator.appVersion.match(/(iphone|ipad|ipod)/gi),s=i.devicePixelRatio||1;p||d&&d[1]>534||c||(s=1);var u=1/s,m=r.querySelector('meta[name="viewport"]');m||(m=r.createElement("meta"),m.setAttribute("name","viewport"),r.head.appendChild(m)),m.setAttribute("content","width=device-width,user-scalable=no,initial-scale="+u+",maximum-scale="+u+",minimum-scale="+u),r.documentElement.style.fontSize=a/2*s*n+"px"},e.exports=t["default"]}]);  flex(100, 1);</script>
+
     <img id="pv" width="1" height="1" style="display:none;" />
     <script type="text/javascript">
         var FE_VERSION = 'v20160712';
@@ -132,5 +131,7 @@
             </ul>
         </div>
     </div>
+    <div style="display: none;" id="welcome"></div>
+    <div style="display: none;" id="home"></div>
 </body>
 </html>

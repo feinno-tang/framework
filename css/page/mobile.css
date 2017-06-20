@@ -1,0 +1,50 @@
+
+.container{
+    width:100%;
+    background-color: #55833e;
+    height: 1905px;
+}
+.title{
+    width:100%;
+    height:847px;
+    background: url('/git2017/framework/image/mobile/bgg.jpg') no-repeat;
+    padding-top: 90px;
+}
+.title p{
+    background: url('/git2017/framework/image/mobile/tt.png') no-repeat;
+    width:701px;
+    height: 412px;
+    margin:0 auto;
+    margin-top:90px;
+}
+.content{
+    position: relative;
+    background:url('/git2017/framework/image/mobile/alpha.png') no-repeat ;
+    height:auto;
+    color:#714a16;
+    top: -185px;
+}
+.content ul{
+    background: url(/git2017/framework/image/mobile/keydunow.png) no-repeat;
+    background-position: 41px 15px;
+    width: 666px;
+    height: 1021px;
+    padding-left: 120px;
+    padding-top: 135px;
+}
+.content ul li{
+    height:70px;
+    line-height: 70px;
+}
+.content ul li .num{font-size: 30px;
+    font-weight: bold;
+    vertical-align: middle;
+    margin-right: 20px;}
+.content ul li .headerImg img{     width: 50px;
+    height: 50px;
+    border-radius: 30px;
+    vertical-align: middle;
+    border: 2px solid;
+    margin-right: 10px;}
+.content li .name{ font-size: 18px;font-family: "Al-Jazeera-Arabic-Regular" !important;}
+.content li .closeValue{ position:absolute;right:110px;font-size: 24px;text-align: right;}

@@ -6,28 +6,62 @@
     <meta name="viewport" id="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
     <!-----只对iOS设备，启动webapp功能，苹果添加到屏幕会生成图标，点击图标会以webapp方式运行（全屏）If content is set to yes, the web application runs in full-screen mode，默认是在safari中打开---->
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <!----和上一个meta标签为一组配合，打开webapp功能才有效，规定了显示电池手机信号，时间的顶部导航栏颜色。default（白色），可以定为black（黑色）和black-translucent（灰色半透明）--->
+    <!----和上一个meta标签为一组配合，打开webapp功能才有效，规定了显示电池手机信号，时间的顶部导航栏颜色。
+    default（白色），可以定为black（黑色）和black-translucent（灰色半透明）--->
     <meta content="black" name="apple-mobile-web-app-status-bar-style" />
     <!---- 格式检测  ，遇到一串数字，不识别为手机号（避免用户点击数字，就激活电话）-->
     <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-title" content="mobile1">
+    <!---禁止百度转码--->
+    <meta http-equiv="Cache-Control" content="no-siteapp">
     <title>自适应</title>
     <!--- 总体上来说，可以利用百分比和flex布局，实现自适应 ，需要固定尺寸的，再用以下的自适应方法 ，配合使用，
             对于一些元素，比如底部导航栏，一般用flex平均分配每个导航元素
     --->
     <!---- 方法1： - 手机屏幕自适应  方法1： 按照设计稿的尺寸做（px）,然后根据实际尺寸除以设计稿尺寸得到一个倍数，设置initial-scale属性为这个倍数--->
     <script>
+        //  ！！！！！！重要！！！！！！！　　  http://blog.csdn.net/maxbyzhou/article/details/53243982
         // -- 匿名函数 自执行, 避免对函数内变量的引用，执行完毕即释放内存--->
+        // viewport 手机浏览器的虚拟窗口，设置 viewport的宽=设计稿宽，所有机型的手机页面都刚好满屏显示
+        /**
+             viewport并非只是ios上的独有属性，在android、winphone上同样也有viewport。它们要解决的问题是相同的，
+         即无视设备的真实分辨率，直接通过dpi，在物理尺寸和浏览器之间重设分辨率，这个分辨率和设备的分辨率无关。比如，你拿个3.5寸-320 * 480的iphone3 gs、3.5寸-640 * 960的iphone4或者9.7寸-1024*768的ipad2，虽然设备的分辨率不同,物理尺寸也不同，但你可以通过设置viewport让它们在浏览器里有相同的分辨率。比如说，
+         你的网站是800px宽，你可以通过设置viewport的width=800，来让你的网站在这三个不同的设备上都刚好满屏显示你的网站。
+         */
+
+        // width=device-width ,表示虚拟窗口宽度 等于物理设备的真是分辨率
+        //iphone6为例： device-width: css-width 逻辑分辨率( 设备宽度) 412（即：window.screen.width ）
+        //              phys.width 物理分辨率（物理宽度） 750  (即document.documentElement.clientWidth)：
+        // scale = 屏幕逻辑分辨率 / 物理分辨率
+
+        /*
+         target-densitydpi=device-dpi ( android only)
+
+         WebKit内核默认按照160的DPI来排版。假如设备真实DPI是480，宽度是1080，在WebKit会按160DPI，360宽度来排版。排版结束后在放大到1080宽。
+
+         所以当取window.innerwidth之类的值的时候，取的是WebKit实际排版宽度360，而不是1080.
+
+         target-densitydpi=device-dpi可以强制内核以480DPI排版，使画面更精细，window.innerwidth也将为屏幕宽度1080.
+
+         但WebKit从去年开始取消了对target-densitydpi的支持。（所以现在不建议写该属性了）
+
+        webkit开发者建议用代替：
+
+         1.responsive images:    http://www.zhangxinxu.com/wordpress/2012/02/responsive-images-introduce/
+         2. css device units:
+
+         */
         (function(){
-            var scalar = 750, //假设设计稿尺寸按 640 设计   scalar:标量   英 ['skeɪlə]  美 [skelɚ]
+            var scalar = 750, //假设设计稿尺寸按 750 设计   scalar:标量   英 ['skeɪlə]  美 [skelɚ]
             scale = parseInt(window.screen.width) / scalar;
             document.getElementById('viewport').setAttribute(
-                'content','target-densitydpi=device-dpi,width=750,user-scalable=no,initial-scale='+scale.toFixed(2)*1);
+                'content','target-densitydpi=device-dpi,width=745,user-scalable=no,initial-scale='+scale.toFixed(2)*1);
         })();
     </script>
     <img id="pv" width="1" height="1" style="display:none;" />
     <script type="text/javascript">
         var FE_VERSION = 'v20160712';
-        var pjPath = 'http://' + location.host + '/git2017/framework/';
+        var pjPath = 'http://' + location.host + '/2017framework/';
         var DOMAIN_CONFIG = {
             'IMAGE_DOMAIN': pjPath+'image/'
         };
@@ -36,7 +70,7 @@
     </script>
     <!---seajs 遵循的CMD规范 ---->
     <!----requireJS 遵循的AMD规范 --->
-    <script type="text/javascript" src="/git2017/framework/js/reference/sea.js"></script>
+    <script type="text/javascript" src="/2017framework/js/reference/sea.js"></script>
     <!----google统计代码 --->
     <script type="text/javascript">
         (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
@@ -72,8 +106,8 @@
                 <li>
                     <span class="num">1</span>
                     <span class="headerImg" data-utp="0" data-identity="12855"><img src="//www.7najm.com:9999/resource/heads/20161025/12855_1_1477398257457.jpg" onerror="this.src='//www.7najm.com:9999/resource/systemRes/img/default/nophoto.jpg';"></span>
-                    <span class="name"> 🍀naenehrjhhggfgg&&* 🍀</span>
-                    <span class="closeValue">10878160</span>
+                    <span class="name"><a href="tel:1898888">tel:18900008888</a></span>
+                    <span class="closeValue"><a href="sms:123456">sms:123456</a></span>
                 </li>
                 <li>
                     <span class="num">1</span>

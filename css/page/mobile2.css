@@ -6,30 +6,33 @@
 .title{
     width:100%;
     height:8.47rem;
-    background: url('/git2017/framework/image/mobile/bgg.jpg') no-repeat;
+    background: url('/2017framework/image/mobile/bgg.jpg') no-repeat;
     padding-top: 0.90rem;
+    background-size: contain;
 }
 .title p{
-    background: url('/git2017/framework/image/mobile/tt.png') no-repeat;
+    background: url('/2017framework/image/mobile/tt.png') no-repeat;
     width:7.01rem;
     height: 4.12rem;
     margin:0 auto;
     margin-top:0.90rem;
+    background-size: contain;
 }
 .content{
     position: relative;
-    background:url('/git2017/framework/image/mobile/alpha.png') no-repeat ;
+    background:url('/2017framework/image/mobile/alpha.png') no-repeat ;
     height:auto;
     color:#714a16;
     top: -1.85rem;
+    background-size: 100%;
 }
 .content ul{
-    background: url(/git2017/framework/image/mobile/keydunow.png) no-repeat;
+    background: url(/2017framework/image/mobile/keydunow.png) no-repeat;
     background-position: 0.41rem 0.15rem;
-    width: 6.66rem;
     height: 10.21rem;
     padding-left: 1.20rem;
     padding-top: 1.35rem;
+    background-size: contain;
 }
 .content ul li{
     height:0.70rem;
@@ -45,5 +48,5 @@
     vertical-align: middle;
     border: 2px solid;
     margin-right: 0.10rem;}
-.content li .name{ font-size: 0.18rem;font-family: "Al-Jazeera-Arabic-Regular" !important;}
+.content li .name{ font-size: 0.18rem;font-family: "Al-Jazeera-Arabic-Regular" !important;vertical-align: middle;s}
 .content li .closeValue{ position:absolute;right:1.10rem;font-size: 0.24rem;text-align: right;}

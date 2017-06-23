@@ -1,6 +1,6 @@
 @font-face {
     font-family: "Al-Jazeera-Arabic-Regular";
-    src: url("/git2017/framework/font/Al-Jazeera-Arabic-Regular.ttf");
+    src: url("/2017framework/font/Al-Jazeera-Arabic-Regular.ttf");
 }
 /* ---------- RESET ------- */
 
@@ -204,3 +204,9 @@ select {
 .clearfix {
     display: block;
 }
+body{color: #000;
+    line-height: 150%;
+    height: 100%;
+    word-wrap: break-word;
+    -webkit-text-size-adjust: none;}
+

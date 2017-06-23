@@ -19,6 +19,8 @@
                     （注:不要手动设置viewport，该方案自动帮你设置）
 
                     阿里代码如下：
+                    使用心得：用此方法，得注意，尺寸过大的图片如背景图，使用background-size:100%  或者background-size:contain
+                    否则在物理分辨率不足750的终端  会出现横向滚动条等问题
     -->
 
     <script>!function(e){function t(a){if(i[a])return i[a].exports;var n=i[a]={exports:{},id:a,loaded:!1};return e[a].call(n.exports,n,n.exports,t),n.loaded=!0,n.exports}var i={};return t.m=e,t.c=i,t.p="",t(0)}([function(e,t){"use strict";Object.defineProperty(t,"__esModule",{value:!0});var i=window;t["default"]=i.flex=function(e,t){var a=e||100,n=t||1,r=i.document,o=navigator.userAgent,d=o.match(/Android[\S\s]+AppleWebkit\/(\d{3})/i),l=o.match(/U3\/((\d+|\.){5,})/i),c=l&&parseInt(l[1].split(".").join(""),10)>=80,p=navigator.appVersion.match(/(iphone|ipad|ipod)/gi),s=i.devicePixelRatio||1;p||d&&d[1]>534||c||(s=1);var u=1/s,m=r.querySelector('meta[name="viewport"]');m||(m=r.createElement("meta"),m.setAttribute("name","viewport"),r.head.appendChild(m)),m.setAttribute("content","width=device-width,user-scalable=no,initial-scale="+u+",maximum-scale="+u+",minimum-scale="+u),r.documentElement.style.fontSize=a/2*s*n+"px"},e.exports=t["default"]}]);  flex(100, 1);</script>
@@ -26,7 +28,7 @@
     <img id="pv" width="1" height="1" style="display:none;" />
     <script type="text/javascript">
         var FE_VERSION = 'v20160712';
-        var pjPath = 'http://' + location.host + '/git2017/framework/';
+        var pjPath = 'http://' + location.host + '/2017framework/';
         var DOMAIN_CONFIG = {
             'IMAGE_DOMAIN': pjPath+'image/'
         };
@@ -35,7 +37,7 @@
     </script>
     <!---seajs 遵循的CMD规范 ---->
     <!----requireJS 遵循的AMD规范 --->
-    <script type="text/javascript" src="/git2017/framework/js/reference/sea.js"></script>
+    <script type="text/javascript" src="/2017framework/js/reference/sea.js"></script>
     <!----google统计代码 --->
     <script type="text/javascript">
         (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){

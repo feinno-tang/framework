@@ -1,0 +1,12 @@
+img{
+
+}
+.main{
+    position: absolute;
+    width:100%;
+    top: 30px;
+    bottom: 30px;
+    overflow-y: scroll;
+    -webkit-overflow-scrolling: touch;
+}
+/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbImxhenlsb2FkLmNzcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQTs7Q0FFQztBQUNEO0lBQ0ksbUJBQW1COztDQUV0QiIsImZpbGUiOiJsYXp5bG9hZC5jc3MiLCJzb3VyY2VzQ29udGVudCI6WyJpbWd7XHJcbiAgICBhbmltYXRpb246YWxsIDAuMXMgZWFzZS1pbi1vdXQ7XHJcbn0iXX0= */

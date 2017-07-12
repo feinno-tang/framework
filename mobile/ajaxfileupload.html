@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ajaxfileupload上传图片</title>
+</head>
+<body>
+<!---
+        个人页文件上传功能用到的ajaxfileupload插件，用法： $.ajaxfileupload({options});
+        原理： options里传服务器处理file文件的url等信息， 插件新建一个fomr表单，表单的action为options.url,method=post,
+        然后再新建一个id为ifrm1的 iframe，使form表单的target为ifrm1，这样form表单提交到服务器，服务器把response的数据返回给iframe里，
+        iframe load之后，调用自定义的callback函数，就实现了成功上传文件而不刷新页面
+
+    --->
+    <form target="frm" action="/start" method="post" enctype="multipart/form-data">
+        <input type='file' name="UploadFile" />
+        <button type="submit">提交</button>
+    </form>
+    <iframe id='frm' name='frm'></iframe>
+
+    <script>
+        function callback(res){
+            alert(res);
+        }
+        var frm = $("#frm");
+        frm.load(function(){
+            var wnd = this.contentWindow;
+            var str = $(wnd.document.body).html();
+            callback(str);
+        });
+    </script>
+</body>
+</html>

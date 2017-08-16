@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+    <meta name="viewport" id="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta content="black" name="apple-mobile-web-app-status-bar-style" />
+    <meta name="format-detection" content="telephone=no">
+    <title>xdm</title>
+    <script>
+        (function(){
+            var scalar = 640, //假设设计稿尺寸按 640 设计   scalar:标量   英 ['skeɪlə]  美 [skelɚ]
+                scale = parseInt(window.screen.width) / scalar;
+//            document.getElementById('viewport').setAttribute('content','target-densitydpi=device-dpi,width=635,use-scalable=no,initial-scale='+scale.toFixed(2));
+        })();
+    </script>
+    <script type="text/javascript">
+        var FE_VERSION = 'v20160712';
+        var pjPath = 'http://' + location.host + '/www/2017framework/';
+        var DOMAIN_CONFIG = {
+            'IMAGE_DOMAIN': pjPath+'image/'
+        };
+    </script>
+    <!---seajs使用出CMD规范   requireJS 遵循的AMD规范 --->
+    <script type="text/javascript" src="../js/reference/sea.js"></script>
+    <script type="text/javascript" src="../js/page/event.js"></script>
+</head>
+<script>
+//    <!----跨文档消息传送（cross-document messaging），有时候简称为XDM  --->
+//    <!---- XDM 现在叫HTML5 postmessage 见js/page/crossdomain.js-->
+    function getData(event){
+        //拖放： 说到拖放，最有意思的恐怕就是能够在框架间、窗口间，甚至在应用间拖放网页元素了。浏览器对拖放的支持为实现这些功能提供了便利。
+//拖动 dragstart drag dragend
+        //dragenter  dragover  dragleave或者drop
+        //event的dataTransfer 对象有两个主要方法：getData()和setData(), dataTransfer 对象的两个属性：dropEffect 和 effectAllowed
+        EventUtil.addHandler(document.getElementById('div1'),'drag',function(event){
+            var dataTransfer = event.dataTransfer;
+            console.log(dataTransfer.getData('url'));
+            dataTransfer.setData('url','jksd.com');
+            //dataTransfer.addElement(element);//为拖动操作添加一个元素
+            //dataTransfer.clearData('format'); //清除以特定格式保存的数据
+            //dataTransfer.setDragImage(element, x, y); //指定一幅图像，当拖动发生时，显示在光标下方
+            //dataTransfer.types;  //当前保存的数据类型
+
+            //读取url
+            var url = dataTransfer.getData('url') || dataTransfer.getData('text/url-list');
+            //读取文本
+            var text  = dataTransfer.getData('Text');
+            ///假设你想允许用户把文本框中的文本拖放到一个<div>元素中。首先，必须将dropEffect 和
+            //    effectAllowed 设置为"move"。但是，由于<div>元素的放置事件的默认行为是什么也不做，所以文
+            //    本不可能自动移动。重写这个默认行为，就能从文本框中移走文本。
+            //默认情况下，图像、链接和文本是可以拖动的，也就是说，不用额外编写代码，用户就可以拖动它们。文本只有在被选中的情况下才能拖动
+
+        });
+
+
+        // 检测浏览器是否支持audio标签播放mp3视频
+        if(document.getElementById('audio1').canPlayType('audio/mpeg')){
+            //进一步操作
+        }
+        // 历史状态管理
+        //通过hashchange 事件，可以知道URL 的参数什么时候发生了变化，即什么时候该有所反应。而
+//    通过状态管理API ， 能够在不加载新页面的情况下改变浏览器的URL 。为此， 需要使用
+//    history.pushState()方法，该方法可以接收三个参数：状态对象、新状态的标题和可选的相对URL。
+//    例如：
+        //history.pushState({name:'ffff'},'title','canvas.html');
+        //因为pushState()会创建新的历史状态，所以你会发现“后退”按钮也能使用了。按下“后退”按钮，会触发window 对象的popstate 事件①。
+//        历史状态管理让我们不必卸载当前页面即可修改浏览器的历史状态栈。有了这种机制，用户就
+//        可以通过“后退”和“前进”按钮在页面状态间切换，而这些状态完全由JavaScript 进行控制。
+//        浏览器的前进与后退，会触发window.onpopstate事件
+        EventUtil.addHandler(window, "popstate", function(event){
+            var state = event.state;
+            if (state){ //第一个页面加载时state 为空
+                console.log(state);
+            }
+        });
+//        那pjax是什么呢？
+//
+//pjax是一种基于ajax+history.pushState的新技术，该技术可以无刷新改变页面的内容，并且可以改变页面的URL。
+//        pjax是ajax+pushState的封装，同时支持本地存储、动画等多种功能。目前支持jquery、qwrap、kissy等多种版本。
+    }
+
+//安全，非数组值将被忽略
+function reverseSort(values){
+    if (values instanceof Array){ //问题解决了--
+        values.sort();
+        values.reverse();
+    }}
+
+//简单的说，语法糖就是一种便捷写法。例如：input.map(item => item + 1);他表示的意思是input.map(function (item) {return item + 1;});
+
+//通过例子你可以看出来，语法糖的使用其实就是让我们的写的代码更简单，看起来也更容易理解。
+
+
+</script>
+<script type="text/javascript;e4x=1">
+//E4X 是以ECMA-357 标准的形式发布的对ECMAScript 的一个扩展。E4X 的目的是为操作XML 数据提供与标准ECMAScript 更相近的语法
+// p.s.  E4X 基本没人用   浏览器支持非常有限,且json在网络数据传输方便比xml要方便太多，导致更没人用
+var employees = <employees>
+<employee position="Software Engineer">
+    <name>Nicholas C. Zakas</name>
+</employee>
+<employee position="Salesperson">
+    <name>Jim Smith</name>
+</employee>
+</employees>;
+console.log(employees.employee[0].name); //"Nicholas C. Zakas"
+console.log(employees.employee[1].name); //"Jim Smith"
+</script>
+</head>
+<body onload="getData()">
+<div id="div1" style="border:1px solid #e3ae14;">8w89r89w8ruw8rhjsnfjsnjn j</div>
+<audio id="audio1" src="http://cdnringuc.shoujiduoduo.com/ringres/user/a24/396/23649396.aac"></audio>
+</body>
+</html>

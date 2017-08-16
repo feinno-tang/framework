@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+    <meta name="viewport" id="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta content="black" name="apple-mobile-web-app-status-bar-style" />
+    <meta name="format-detection" content="telephone=no">
+    <title>json & ajax</title>
+    <script>
+        (function(){
+            var scalar = 640, //假设设计稿尺寸按 640 设计   scalar:标量   英 ['skeɪlə]  美 [skelɚ]
+                scale = parseInt(window.screen.width) / scalar;
+            document.getElementById('viewport').setAttribute(
+                'content','target-densitydpi=device-dpi,width=635,use-scalable=no,initial-scale='+scale.toFixed(2));
+        })();
+    </script>
+    <script type="text/javascript">
+        var FE_VERSION = 'v20160712';
+        var pjPath = 'http://' + location.host + '/www/2017framework/';
+        var DOMAIN_CONFIG = {
+            'IMAGE_DOMAIN': pjPath+'image/'
+        };
+    </script>
+    <!---seajs使用出CMD规范   requireJS 遵循的AMD规范 --->
+    <script type="text/javascript" src="../js/reference/sea.js"></script>
+</head>
+<script>
+
+    /*
+    JSON 的语法可以表示以下三种类型的值
+    1.简单值
+         5    是用json表示数值
+        "hello" 是用json表示字符串
+          √ JavaScript 字符串与JSON 字符串的最大区别在于，JSON 字符串必须使用双引号（单引号会导致语法错误）。
+          布尔值和null 也是有效的JSON 形式
+    2.对象
+          json对象的属性任何时候都必须加双引号,javascript的属性可以不加引号，可以单双引号
+    3，数组
+    */
+    var book = {
+        "title": "Professional JavaScript",
+        "authors": ["Nicholas C. Zakas"],
+        edition: 3,
+        year: 2011
+    };
+    var jsonText = JSON.stringify(book, function(key, value){ //过滤函数 replacer
+        switch(key){
+            case "authors":
+                return value.join(",")
+            case "year":
+                return 5000;
+            case "edition":
+                return undefined;
+            default:
+                return value;
+        }
+    });
+    //undefined的会自动过滤掉
+    //{"title":"Professional JavaScript","authors":"Nicholas C. Zakas","year":5000}
+    var jsonText = JSON.stringify(book, null, 4); // 4: json字符串缩进
+    console.log(jsonText);
+
+    var book = {
+        "title": "Professional JavaScript",
+        "authors": [
+            "Nicholas C. Zakas"
+        ],
+        edition: 3,
+        year: 2011,
+        toJSON: function(){
+            return this.title;
+        }
+    };
+    var jsonText = JSON.stringify(book);
+    console.log(jsonText);
+
+
+
+    var book = {
+        "title": "Professional JavaScript",
+        "authors": [
+            "Nicholas C. Zakas"
+        ],
+        edition: 3,
+        year: 2011,
+        releaseDate: new Date(2011, 11, 1)
+    };
+    var jsonText = JSON.stringify(book);
+    console.log(jsonText);
+    var bookCopy = JSON.parse(jsonText, function(key, value){ //还原函数  reviver
+        if (key == "releaseDate"){
+            return new Date(value);
+        } else {
+            return value;
+        }
+    });
+    alert(bookCopy.releaseDate.getFullYear());
+
+
+</script>
+<script>
+    function getData(){
+        /*
+         XMLHttpRequest 虽然名字中包含XML 的成分，但Ajax 通信与数据格式无关；这种技术就是无须刷新页面即可从服务器取得数
+         据，但不一定是XML 数据。
+         早在1998 年就有人采用不同的手段实现了这种浏览器
+         与服务器的通信。再往前推，JavaScript 需要通过Java applet 或Flash 电影等中间层向服务器发送请求
+         XHR 则将浏览器原生的通信能力提供给了开发人员，简化了实现同样操作的任务
+         */
+        function createXHR(){
+            if (typeof XMLHttpRequest != "undefined"){
+                return new XMLHttpRequest();
+            } else if (typeof ActiveXObject != "undefined"){ //ie7以前
+                if (typeof arguments.callee.activeXString != "string"){
+                    var versions = [ "MSXML2.XMLHttp.6.0", "MSXML2.XMLHttp.3.0",
+                            "MSXML2.XMLHttp"],
+                        i, len;
+                    for (i=0,len=versions.length; i < len; i++){
+                        try {
+                            new ActiveXObject(versions[i]);
+                            arguments.callee.activeXString = versions[i];
+                            break;
+                        } catch (ex){
+//跳过
+                        }
+                    }
+                }
+                return new ActiveXObject(arguments.callee.activeXString);
+            } else {
+                throw new Error("No XHR object available.");
+            }
+        }
+        var xhr = createXHR();
+        xhr.onreadystatechange = function(){ //xhr发送完毕后会更新xhr对象的 readyStatus，responseText等属性
+            if (xhr.readyState == 4){
+                if ((xhr.status >= 200 && xhr.status < 300) || xhr.status == 304){
+                    alert(xhr.responseText);
+                } else {
+                    alert("Request was unsuccessful: " + xhr.status);
+                }
+            }
+        };
+        xhr.onprogress = function(event){ //进度
+            var divStatus = document.getElementById("status");
+            if (event.lengthComputable){
+                divStatus.innerHTML = "Received " + event.position + " of " +
+                    event.totalSize +" bytes";
+            }
+        };
+        xhr.open("post", "postexample.php", true); //get 地址  是否异步:false 表示同步   true表示异步
+        // 调用open()方法并不会真正发送请求，而只是启动一个请求以备发送
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        var form = document.getElementById("myform");
+        console.log(serialize(form));
+        xhr.send(serialize(form));//参数;即要作为请求主体发送的数据
+        //var form = document.getElementById("user-info");
+        // 使用FormData 的方便之处体现在不必明确地在XHR 对象上设置请求头部。XHR 对象能够识别传入的数据类型是FormData 的实例，并配置适当的头部信息
+        //xhr.send(new FormData(form));
+
+
+        //序列化数组
+        function serialize(form){
+            var parts = [], //定义一个名为parts 的数组，用于保存将要创建的字符串的各个部分。
+                field = null,
+                i,
+                len,
+                j,
+                optLen,
+                option,
+                optValue;
+            for (i=0, len=form.elements.length; i < len; i++){
+                field = form.elements[i];
+                switch(field.type){
+                    case "select-one":
+                    case "select-multiple": //是<select>元素，它可能是单选框也可能是多选框
+                        if (field.name.length){
+                            for (j=0, optLen = field.options.length; j < optLen; j++){
+                                option = field.options[j];
+                                if (option.selected){
+                                    optValue = "";
+                                    if (option.hasAttribute){ //DOM
+                                        optValue = (option.hasAttribute("value") ? option.value : option.text);
+                                    } else {  //IE
+                                        optValue = (option.attributes["value"].specified ?
+                                            option.value : option.text);
+                                    }
+                                    parts.push(encodeURIComponent(field.name) + "=" +
+                                        encodeURIComponent(optValue));
+                                }
+                            }
+                        }
+                        break;
+                    case undefined: //字段集
+                    case "file": //文件输入
+                    case "submit": //提交按钮
+                    case "reset": //重置按钮
+                    case "button": //自定义按钮
+                        break;
+                    case "radio": //单选按钮
+                    case "checkbox": //复选框
+                        if (!field.checked){  //对于单选按钮和复选框，要检查其checked 属性是否被设置为false
+                            break; //如果是则退出switch 语句。如果checked 属性   如果checked为true 则继续执行default 语句
+                        }
+                        /* 执行默认操作 */
+                    default:
+//不包含没有名字的表单字段
+                        if (field.name.length){
+                            parts.push(encodeURIComponent(field.name) + "=" +
+                                encodeURIComponent(field.value));
+                        }
+                }
+            }
+            return parts.join("&");
+        }
+
+
+
+        function addURLParam(url, name, value) {
+            url += (url.indexOf("?") == -1 ? "?" : "&");
+            url += encodeURIComponent(name) + "=" + encodeURIComponent(value);
+            return url;
+        }
+
+        /*
+         * XHR 对象的readyState
+         *  0：未初始化。尚未调用open()方法。
+          1：启动。已经调用open()方法，但尚未调用send()方法。
+          2：发送。已经调用send()方法，但尚未接收到响应。
+          3：接收。已经接收到部分响应数据。
+          4：完成。已经接收到全部响应数据，而且已经可以在客户端使用了
+
+         在接收到响应之前还可以调用abort()方法来取消异步请求，如下所示：
+         xhr.abort();
+         调用这个方法后，XHR 对象会停止触发事件，而且也不再允许访问任何与响应有关的对象属性。在
+         终止请求之后，还应该对XHR 对象进行解引用操作。
+
+         通过XHR 实现Ajax 通信的一个主要限制，来源于跨域安全策略。默认情况下，XHR 对象只能访
+         问与包含它的页面位于同一个域中的资源。这种安全策略可以预防某些恶意行为
+         CORS（Cross-Origin Resource Sharing，跨源资源共享）
+         。CORS 背后的基本思想，就是使用自定义的HTTP 头部
+         让浏览器与服务器进行沟通，从而决定请求或响应是应该成功，还是应该失败
+
+         Browser端： Origin: http://www.nczonline.net
+         Server端: Access-Control-Allow-Origin: http://www.nczonline.net
+
+
+
+         * */
+        //跨浏览器的CORS
+        function createCORSRequest(method, url){
+            var xhr = new XMLHttpRequest();
+            if ("withCredentials" in xhr){
+                xhr.open(method, url, true);
+            } else if (typeof XDomainRequest != "undefined"){ //IE8
+                xhr = new XDomainRequest();
+                xhr.open(method, url);
+            } else {
+                xhr = null;
+            }
+            return xhr;
+        }
+        var request = createCORSRequest("get", "http://www.somewhere-else.com/page/");
+        if (request){
+            request.onload = function(){
+//对request.responseText 进行处理
+            };
+            request.send();
+        }
+
+/*  Ajax 是一种从页面向服务器请求数据的技术，而Comet 则是一种服务器向页面推送数据的技
+        术 Comet 能够让信息近乎实时地被推送到页面上，非常适合处理体育比赛的分数和股票报价。
+    有两种实现Comet 的方式：长轮询和流
+
+        SSE
+（Server-Sent Events，服务器发送事件）是一种实现Comet 交互的浏览器API，既支持长轮询，也支持HTTP 流
+         */
+
+        /**
+        Web Sockets
+        Web Sockets 的目标是在一个单独的持久连接上提供全双工、双向通信。
+           √ 全双工指可以同时（瞬时）进行信号的双向传输（A→B且B→A）。指A→B的同时B→A，是瞬时同步的。
+          区别    单工： 只允许甲方向乙方传送信息，而乙方不能向甲方传送 。（比喻汽车的单行道。
+                半双工（Half Duplex）：  指一个时间段内只有一个动作发生，eg早期的对讲机、早期集线器等设备都是基于半双工的产品
+        由于传递的数据包很小，因此Web Sockets 非常适合移动应用。
+
+
+         Web Sockets 的 readyState 属性。不过，这个属性的值与XHR 并不相同，而是如下所示。
+          WebSocket.OPENING (0)：正在建立连接。
+          WebSocket.OPEN (1)：已经建立连接。
+          WebSocket.CLOSING (2)：正在关闭连接。
+          WebSocket.CLOSE (3)：已经关闭连接。
+         *
+         * */
+
+        var socket = new WebSocket("ws://www.example.com/server.php");
+        var message = {
+            time: new Date(),
+            text: "Hello world!",
+            clientId: "asdfp8734rew"
+        };
+        socket.send(JSON.stringify(message));// 必须是JSON 字符串
+        socket.onmessage = function(event){
+            var data = event.data;
+//处理数据
+        };
+
+//TDD（Test-driven development，测试驱动开发）是一种以单元测试为核心的软件开发过程
+//        JsUnit   ：http://www.jsunit.net/
+        //yuitest ：http://yuilibrary.com/projects/yuitest/
+    }
+
+</script>
+</head>
+<body onload="getData()">
+<form id="myform">
+    <table>
+        <tbody>
+        <tr>
+            <td>姓名:</td>
+            <td><input name="name" type="text"></td>
+        </tr>
+        <tr>
+            <td>性别:</td>
+            <td><input name="sex" type="radio" value="1"> 男 <input name="sex" type="radio" value="0"> 女</td>
+        </tr>
+        <tr>
+            <td>年龄:</td>
+            <td><select name="age"><option value="20">20</option><option value="21">21</option><option value="22">22</option></select></td>
+        </tr>
+        <tr>
+            <td colspan="2"><input id="ajaxBtn" type="button" value="提交"></td>
+        </tr>
+        </tbody>
+    </table>
+</form>
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>flex布局 阮一峰大神</title>
+    <style>
+        .box{
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            align-content: space-between;
+            flex-direction: column;
+            width:90px;height:90px;border:1px solid #cecece;
+        }
+        .item{width:10px;height: 10px;border-radius: 50%;background: black;margin: 10px;}
+        .grid {
+            display: flex;
+            width: 90px;
+            height: 90px;
+            border: 1px solid #cecece;
+            margin-top: 5px;
+        }
+        .grid-cell{flex:1;height: 30px;background: #cecece;}
+        .u-full{flex:0 0 100%; /* flex-grow,flex-shrink,flex-basis */}
+        .u-lof2{flex:0  0 50%;}
+        .u-lof3{flex:0  0 33.33%;}
+        .u-lof4{flex:0  0 25%;}
+        /* 圣杯布局： 头 中（左中右）尾**/
+        .HolyGrail{display: flex;flex-direction:column;width:300px;border:1px solid #cecece;text-align: center;}
+        .HolyGrail header,.HolyGrail-body footer{flex:1;}
+        .HolyGrail .HolyGrail-body{display: flex;flex:1;height:200px;}
+        .HolyGrail-body main{flex:1;background: #cecece;}
+        .HolyGrail-body nav,aside{flex:0 0 12px;}
+        .HolyGrail-body aside{order:-1;}
+        /* 主内容左侧+图片*/
+        .Media {display: flex;align-items: flex-start;border:1px solid #cecece;margin-top:5px;}
+        .Media-figure {margin-right: 10px;}
+        .Media-body {flex: 1;}
+    </style>
+    <script type="text/javascript">
+        var FE_VERSION = 'v20160712';
+        var pjPath = 'http://' + location.host + '/www/2017framework/';
+        var DOMAIN_CONFIG = {
+            'IMAGE_DOMAIN': pjPath+'image/'
+        };
+    </script>
+    <script type="text/javascript" src="../js/reference/sea.js"></script>
+</head>
+<body>
+    <div class="box">
+            <span class="item"></span>
+            <span class="item"></span>
+            <span class="item"></span>
+            <span class="item"></span>
+            <span class="item"></span>
+            <span class="item"></span>
+    </div>
+    <div class="grid">
+        <div class="grid-cell u-lof2"></div>
+        <div class="grid-cell"></div>
+        <div class="grid-cell"></div>
+    </div>
+    <div class="HolyGrail">
+        <header>header</header>
+        <div class="HolyGrail-body">
+            <main class="HolyGrail-content">main</main>
+            <nav class="HolyGrail-nav">nav</nav>
+            <aside class="HolyGrail-ads">ads</aside>
+        </div>
+        <footer>footer</footer>
+    </div>
+    <div class="Media">
+        <img class="Media-figure" src="../image/crown.png" alt="">
+        <p class="Media-body">bbbbbbbody<br>bbbbbbbodybbbbbbbodybbbbbbbody<br>bbbbbbbodybbbbbbbodybbbbbbbody<br>bbbbbbbody</p>
+    </div>
+</body>
+</html>

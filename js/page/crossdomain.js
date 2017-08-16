@@ -48,7 +48,7 @@
                  <script>
                  function getData(){
                         var iframe = document.createElement('iframe');
-                        iframe.src = 'test.html';
+                        iframe.src = 'b.html';
                         document.body.appendChild(iframe);
 
                         iframe.onload = function(){

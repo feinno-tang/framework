@@ -4,136 +4,126 @@
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
     <!----初始宽度为设备宽度 initial-scale=1 ,用户不可手动缩放，添加id属性，方便js操作 --->
     <meta name="viewport" id="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
+    <!--<meta name="flexible" content="initial-dpr=2" />-->
     <!-----只对iOS设备，启动webapp功能，苹果添加到屏幕会生成图标，点击图标会以webapp方式运行（全屏）If content is set to yes, the web application runs in full-screen mode，默认是在safari中打开---->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <!----和上一个meta标签为一组配合，打开webapp功能才有效，规定了显示电池手机信号，时间的顶部导航栏颜色。default（白色），可以定为black（黑色）和black-translucent（灰色半透明）--->
     <meta content="black" name="apple-mobile-web-app-status-bar-style" />
     <!---- 格式检测  ，遇到一串数字，不识别为手机号（避免用户点击数字，就激活电话）-->
     <meta name="format-detection" content="telephone=no">
-    <title>自适应</title>
+
+    <title>自适应2</title>
+    <!--- 文字流式，控件弹性（flexible）,图片缩放--->
     <!---- 方法1： - 手机屏幕自适应  方法1： 按照设计稿的尺寸做（px）,然后根据实际尺寸除以设计稿尺寸得到一个倍数，设置initial-scale属性为这个倍数--->
 
-    <!----方法2 ： 手机屏幕自适应  方法2：阿里高清方案布局代码 ：放一段阿里的代码，代码会自动判断dpr,来设置html的font-size
-                   一般给的设计稿是640 或者750，对应的苹果设备为dpr:2   阿里代码默认设置的dpr是2，html根元素的font-size:100px
-                    可按照设计稿中1px->0.01rem来写样式。 添加代码后，无需再手动设置 viewport
-                    （注:不要手动设置viewport，该方案自动帮你设置）
+    <!----方法2 ： 手机屏幕自适应  方法2：淘宝h5 flexible布局代码
+                    写css的时候按照设计图的横向长度 / 10 ，比如设计稿是750px, 那么1rem=75px;
+                    在最开头引淘宝flexible代码，代码把 代码会自动判断dpr,来设置meta标签的scale属性和html的font-size
+                    1.动态改写<meta>标签 scale属性们
+                    2.给<html>元素添加data-dpr属性，并且动态改写data-dpr的值
+                    3.给<html>元素添加font-size属性，并且动态改写font-size的值
 
-                    阿里代码如下：
-                    使用心得：用此方法，得注意，尺寸过大的图片如背景图，使用background-size:100%  或者background-size:contain
-                    否则在物理分辨率不足750的终端  会出现横向滚动条等问题
     -->
-
-    <script>!function(e){function t(a){if(i[a])return i[a].exports;var n=i[a]={exports:{},id:a,loaded:!1};return e[a].call(n.exports,n,n.exports,t),n.loaded=!0,n.exports}var i={};return t.m=e,t.c=i,t.p="",t(0)}([function(e,t){"use strict";Object.defineProperty(t,"__esModule",{value:!0});var i=window;t["default"]=i.flex=function(e,t){var a=e||100,n=t||1,r=i.document,o=navigator.userAgent,d=o.match(/Android[\S\s]+AppleWebkit\/(\d{3})/i),l=o.match(/U3\/((\d+|\.){5,})/i),c=l&&parseInt(l[1].split(".").join(""),10)>=80,p=navigator.appVersion.match(/(iphone|ipad|ipod)/gi),s=i.devicePixelRatio||1;p||d&&d[1]>534||c||(s=1);var u=1/s,m=r.querySelector('meta[name="viewport"]');m||(m=r.createElement("meta"),m.setAttribute("name","viewport"),r.head.appendChild(m)),m.setAttribute("content","width=device-width,user-scalable=no,initial-scale="+u+",maximum-scale="+u+",minimum-scale="+u),r.documentElement.style.fontSize=a/2*s*n+"px"},e.exports=t["default"]}]);  flex(100, 1);</script>
-
-    <img id="pv" width="1" height="1" style="display:none;" />
+    <script type="text/javascript">
+        var DPR = 1,uAgent = window.navigator.userAgent;
+        var isIOS =uAgent.match(/iphone/i),
+            isYIXIN = uAgent.match(/yixin/i),
+            is2345 = uAgent.match(/Mb2345/i),
+            isHaosou = uAgent.match(/mso_app/i),
+            isSogou = uAgent.match(/sogoumobilebrowser/ig),
+            isLiebao = uAgent.match(/liebaofast/i),
+            isGnbr = uAgent.match(/GNBR/i);
+        // js动态设置html font-size大小- 移动网页自适应
+        function resizeRoot(){
+            var wDpr,wFsize;
+//            window.screen.width (屏幕宽度   也就是屏幕分辨率的宽度)
+//            window.innerWidth（ 当前网页宽度 ）
+            var wWidth = (screen.width > 0)? ( window.innerWidth >= screen.width || window.innerWidth == 0)?screen.width:window.innerWidth:window.innerWidth;
+            var wHeight = (screen.height>0)?(window.innerHeight >= screen.height || window.innerHeight ==0 ) ? screen.height : screen.innerHeight: screen.innerHeight;
+            if(window.devicePixelRatio){
+                wDpr = window.devicePixelRatio;
+            }else{
+                wDpr = isIOS ? wWidth > 818 ? 3 : wWidth > 480 ? 2 : 1 : 1;
+            }
+            wFsize = wWidth > 1080 ? 144 : wWidth/7.5; // 750 设计稿，fontsize为100px.
+            wFsize = wFsize > 32 ? wFsize: 32; //最小32
+            if (isYIXIN || is2345 || isHaosou || isSogou || isLiebao || isGnbr) { //YIXIN 和 2345 这里有个刚调用系统浏览器时候的bug，需要一点延迟来获取
+                setTimeout(function () {
+                    wWidth = (screen.width > 0) ? (window.innerWidth >= screen.width || window.innerWidth == 0) ?
+                        screen.width : window.innerWidth : window.innerWidth;
+                    wHeight = (screen.height > 0) ? (window.innerHeight >= screen.height || window.innerHeight ==
+                    0) ? screen.height : window.innerHeight : window.innerHeight;
+                    wFsize = wWidth > 1080 ? 144 : wWidth / 7.5;
+                    wFsize = wFsize > 32 ? wFsize : 32;
+                    // document.getElementsByTagName('html')[0].dataset.dpr = wDpr;
+                    document.getElementsByTagName('html')[0].style.fontSize = wFsize + 'px';
+                    document.getElementById("fixed").style.display = "none";
+                }, 500);
+            } else {
+                // document.getElementsByTagName('html')[0].dataset.dpr = wDpr;
+                document.getElementsByTagName('html')[0].style.fontSize = wFsize + 'px';
+                document.getElementById("fixed").style.display = "none";
+            }
+        }
+        resizeRoot();
+    </script>
+    <!--<script src="/www/2017framework/js/reference/flexible_css.debug.js"></script>-->
+    <!--<script src="/www/2017framework/js/reference/flexible.debug.js"></script>-->
     <script type="text/javascript">
         var FE_VERSION = 'v20160712';
         var pjPath = 'http://' + location.host + '/www/2017framework/';
         var DOMAIN_CONFIG = {
             'IMAGE_DOMAIN': pjPath+'image/'
         };
-        /**** ----只要刷页面就调一次统计pv - */
-        //document.getElementById('pv').src=DOMAIN_CONFIG['SITE_DOMAIN']+'user_pvReport.fly?t='+ (new Date).getTime();
     </script>
-    <!---seajs 遵循的CMD规范 ---->
-    <!----requireJS 遵循的AMD规范 --->
     <script type="text/javascript" src="/www/2017framework/js/reference/sea.js"></script>
-    <!----google统计代码 --->
-    <script type="text/javascript">
-        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-        ga('create', 'UA-57564405-1', 'auto');
-        ga('send', 'pageview');
-
-        !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-            n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
-            n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
-            t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
-            document,'script','https://connect.facebook.net/en_US/fbevents.js');
-
-        fbq('init', '897105567032410');
-        fbq('track', "PageView");
-    </script>
 </head>
-<script>
-    function getData(){
-
-    }
-</script>
 </head>
-<body onload="getData()">
+<body>
     <div class="container">
-        <div class="title">
-            <p></p>
-        </div>
-        <div class="content">
+        <section class="header">
+            <a href="#">首页1</a>
+            <a href="#">首页2</a>
+            <a href="#">首页3</a>
+            <a href="#">首页4</a>
+            <a href="#">首页5</a>
+        </section>
+        <section class="main">
+            <section style="height:0.88rem;line-height:0.88rem;background: #F7F7F8;">
+                <p style="font-size: 0.34rem;color: #292929;">live</p>
+            </section>
             <ul>
                 <li>
-                    <span class="num">1</span>
-                    <span class="headerImg" data-utp="0" data-identity="12855"><img src="//www.7najm.com:9999/resource/heads/20161025/12855_1_1477398257457.jpg" onerror="this.src='//www.7najm.com:9999/resource/systemRes/img/default/nophoto.jpg';"></span>
-                    <span class="name"> 🍀naenehrjhhggfgg&&* 🍀</span>
-                    <span class="closeValue">10878160</span>
+                    <img src="/www/2017framework/image/man.jpg">
+                    <div>
+                        <h4>题目题目题目听听题目题目题目题目</h4>
+                        <h5>描述描述miso什么话辐射发货的金凤凰的经适房橘黄色的交话费计算机等放寒假收到货福建省就粉红色交电话费橘黄色的金凤凰</h5>
+                        <p>
+                           <span>有3333人购买</span>
+                            <a class="buy">马上抢</a>
+                        </p>
+                    </div>
                 </li>
                 <li>
-                    <span class="num">1</span>
-                    <span class="headerImg" data-utp="0" data-identity="12855"><img src="//www.7najm.com:9999/resource/heads/20161025/12855_1_1477398257457.jpg" onerror="this.src='//www.7najm.com:9999/resource/systemRes/img/default/nophoto.jpg';"></span>
-                    <span class="name"> 🍀naenehrjhhggfgg&&* 🍀</span>
-                    <span class="closeValue">10878160</span>
-                </li>
-                <li>
-                    <span class="num">1</span>
-                    <span class="headerImg" data-utp="0" data-identity="12855"><img src="//www.7najm.com:9999/resource/heads/20161025/12855_1_1477398257457.jpg" onerror="this.src='//www.7najm.com:9999/resource/systemRes/img/default/nophoto.jpg';"></span>
-                    <span class="name"> 🍀naenehrjhhggfgg&&* 🍀</span>
-                    <span class="closeValue">10878160</span>
-                </li>
-                <li>
-                    <span class="num">1</span>
-                    <span class="headerImg" data-utp="0" data-identity="12855"><img src="//www.7najm.com:9999/resource/heads/20161025/12855_1_1477398257457.jpg" onerror="this.src='//www.7najm.com:9999/resource/systemRes/img/default/nophoto.jpg';"></span>
-                    <span class="name"> 🍀naenehrjhhggfgg&&* 🍀</span>
-                    <span class="closeValue">10878160</span>
-                </li>
-                <li>
-                    <span class="num">1</span>
-                    <span class="headerImg" data-utp="0" data-identity="12855"><img src="//www.7najm.com:9999/resource/heads/20161025/12855_1_1477398257457.jpg" onerror="this.src='//www.7najm.com:9999/resource/systemRes/img/default/nophoto.jpg';"></span>
-                    <span class="name"> 🍀naenehrjhhggfgg&&* 🍀</span>
-                    <span class="closeValue">10878160</span>
-                </li>
-                <li>
-                    <span class="num">1</span>
-                    <span class="headerImg" data-utp="0" data-identity="12855"><img src="//www.7najm.com:9999/resource/heads/20161025/12855_1_1477398257457.jpg" onerror="this.src='//www.7najm.com:9999/resource/systemRes/img/default/nophoto.jpg';"></span>
-                    <span class="name"> 🍀naenehrjhhggfgg&&* 🍀</span>
-                    <span class="closeValue">10878160</span>
-                </li>
-                <li>
-                    <span class="num">1</span>
-                    <span class="headerImg" data-utp="0" data-identity="12855"><img src="//www.7najm.com:9999/resource/heads/20161025/12855_1_1477398257457.jpg" onerror="this.src='//www.7najm.com:9999/resource/systemRes/img/default/nophoto.jpg';"></span>
-                    <span class="name"> 🍀naenehrjhhggfgg&&* 🍀</span>
-                    <span class="closeValue">10878160</span>
-                </li>
-                <li>
-                    <span class="num">1</span>
-                    <span class="headerImg" data-utp="0" data-identity="12855"><img src="//www.7najm.com:9999/resource/heads/20161025/12855_1_1477398257457.jpg" onerror="this.src='//www.7najm.com:9999/resource/systemRes/img/default/nophoto.jpg';"></span>
-                    <span class="name"> 🍀naenehrjhhggfgg&&* 🍀</span>
-                    <span class="closeValue">10878160</span>
-                </li>
-                <li>
-                    <span class="num">1</span>
-                    <span class="headerImg" data-utp="0" data-identity="12855"><img src="//www.7najm.com:9999/resource/heads/20161025/12855_1_1477398257457.jpg" onerror="this.src='//www.7najm.com:9999/resource/systemRes/img/default/nophoto.jpg';"></span>
-                    <span class="name"> 🍀naenehrjhhggfgg&&* 🍀</span>
-                    <span class="closeValue">10878160</span>
-                </li>
-                <li>
-                    <span class="num">1</span>
-                    <span class="headerImg" data-utp="0" data-identity="12855"><img src="//www.7najm.com:9999/resource/heads/20161025/12855_1_1477398257457.jpg" onerror="this.src='//www.7najm.com:9999/resource/systemRes/img/default/nophoto.jpg';"></span>
-                    <span class="name"> 🍀naenehrjhhggfgg&&* 🍀</span>
-                    <span class="closeValue">10878160</span>
+                    <img src="/www/2017framework/image/man.jpg">
+                    <div>
+                        <h4>题目题目题目听听题目题目题目题目</h4>
+                        <h5>描述描述miso什么话辐射发货的金凤凰的经适房橘黄色的交话费计算机等放寒假收到货福建省就粉红色交电话费橘黄色的金凤凰</h5>
+                        <p>
+                            <span>有3333人购买</span>
+                            <a class="buy">马上抢</a>
+                        </p>
+                    </div>
                 </li>
             </ul>
-        </div>
+        </section>
+        <footer>
+            <a href="#">footer1</a>
+            <a href="#">footer2</a>
+            <a href="#">footer3</a>
+            <a href="#">footer4</a>
+            <a href="#">footre5</a>
+        </footer>
     </div>
-    <div style="display: none;" id="welcome"></div>
-    <div style="display: none;" id="home"></div>
 </body>
 </html>

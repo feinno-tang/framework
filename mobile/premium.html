@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+    <meta name="viewport" id="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta content="black" name="apple-mobile-web-app-status-bar-style" />
+    <meta name="format-detection" content="telephone=no">
+    <title>22chapter高级技巧</title>
+    <script>
+        (function(){
+            var scalar = 640, //假设设计稿尺寸按 640 设计   scalar:标量   英 ['skeɪlə]  美 [skelɚ]
+                scale = parseInt(window.screen.width) / scalar;
+            document.getElementById('viewport').setAttribute('content','target-densitydpi=device-dpi,width=635,use-scalable=no,initial-scale='+scale.toFixed(2));
+        })();
+    </script>
+    <script type="text/javascript">
+        var FE_VERSION = 'v20160712';
+        var pjPath = 'http://' + location.host + '/www/2017framework/';
+        var DOMAIN_CONFIG = {
+            'IMAGE_DOMAIN': pjPath+'image/'
+        };
+    </script>
+    <!---seajs使用出CMD规范   requireJS 遵循的AMD规范 --->
+    <script type="text/javascript" src="../js/reference/sea.js"></script>
+    <script type="text/javascript" src="../js/page/event.js"></script>
+</head>
+<script>
+    function getData(){
+        function isArray(value){ //检测是否数组
+            return Object.prototype.toString.call(value) == "[object Array]";
+        }
+        function isFunction(value){ //检测是否函数
+            return Object.prototype.toString.call(value) == "[object Function]";
+        }
+        function isRegExp(value){ //检测是否正则表达式
+            return Object.prototype.toString.call(value) == "[object RegExp]";
+        }
+        function isNativeJson(value){//检测是否是原生的json对象
+            return window.JSON && Object.prototype.toString.call(value) == "[object JSON]";
+        }
+        function Person(name,age,job){
+            this.name = name;
+            this.age = age;
+            this.job = job;
+        }
+        var person1 = new Person('nicholas',29,'se');
+        var person2 = Person('dd',29,'se');//undefined
+        //alert(person1.name); //nicholas
+        //alert(person2.name); // Uncaught TypeError: Cannot read property 'name' of undefined
+        function Person2(name,age,job){
+            if(this instanceof  Person){ //作用域安全的构造函数
+                this.name = name;
+                this.age = age;
+                this.job = job;
+            }else{
+                return new Person(name,age,job);
+            }
+        }
+        var person3 = Person2("Nicholas", 29, "Software Engineer");
+        //alert(window.name); //"dd"
+        //alert(person3.name); //"Nicholas"
+        var person4 = new Person2("Shelby", 34, "Ergonomist");
+        //alert(person4.name); //"Shelby"
+
+        //惰性载入函数  方法1
+        function createXHR(){
+            if (typeof XMLHttpRequest != "undefined"){
+                createXHR = function(){
+                    return new XMLHttpRequest();
+                };
+            } else if (typeof ActiveXObject != "undefined"){
+                createXHR = function(){
+                    if (typeof arguments.callee.activeXString != "string"){
+                        var versions = ["MSXML2.XMLHttp.6.0", "MSXML2.XMLHttp.3.0",
+                                "MSXML2.XMLHttp"],
+                            i, len;
+                        for (i=0,len=versions.length; i < len; i++){
+                            try {
+                                new ActiveXObject(versions[i]);
+                                arguments.callee.activeXString = versions[i];
+                                break;
+                            } catch (ex){
+//skip
+                            }
+                        }
+                    }
+                    return new ActiveXObject(arguments.callee.activeXString);
+                };
+            } else {
+                createXHR = function(){
+                    throw new Error("No XHR object available.");
+                };
+            }
+            return createXHR();
+        }
+
+        //惰性载入函数 方法2
+        var createXHR = (function(){
+            if (typeof XMLHttpRequest != "undefined"){
+                return function(){
+                    return new XMLHttpRequest();
+                };
+            } else if (typeof ActiveXObject != "undefined"){
+                return function(){
+                    if (typeof arguments.callee.activeXString != "string"){
+                        var versions = ["MSXML2.XMLHttp.6.0", "MSXML2.XMLHttp.3.0",
+                                "MSXML2.XMLHttp"],
+                            i, len;
+                        for (i=0,len=versions.length; i < len; i++){
+                            try {
+                                new ActiveXObject(versions[i]);
+                                arguments.callee.activeXString = versions[i];
+                                break;
+                            } catch (ex){
+//skip
+                            }
+                        }
+                    }
+                    return new ActiveXObject(arguments.callee.activeXString);
+                };
+            } else {
+                return function(){
+                    throw new Error("No XHR object available.");
+                };
+            }
+        })();
+
+        //函数绑定
+        var handler = {
+            message: "Event handled",
+            handleClick: function(name,event){
+                //alert(this.message);   //Event handled
+                //alert(event.type); //click
+                //alert(name);   //
+            }
+        };
+        var btn = document.getElementById("my-btn");
+        EventUtil.addHandler(btn, "click",bind(handler.handleClick,handler,name)); //自定义bind()方法
+        //EventUtil.addHandler(btn, "click",handler.handleClick.bind(handler));//原生bind方法
+        //支持原生bind()方法的浏览器有IE9+、Firefox 4+和Chrome。
+
+        function bind(fn, context){
+            var args = Array.prototype.slice.call(arguments, 2);//从第三个取，即 ： name
+            return function(){
+                var innerArgs = Array.prototype.slice.call(arguments);
+                console.log(args);
+                console.log(innerArgs);
+                var finalArgs = args.concat(innerArgs);
+                return fn.apply(context, finalArgs);
+            };
+        }
+
+        //函数柯里化（function currying）
+        /* 它用于创建已经设置好了一个或多
+         个参数的函数。函数柯里化的基本方法和函数绑定是一样的：使用一个闭包返回一个函数。两者的区别
+         在于，当函数被调用时，返回的函数还需要设置一些传入的参数
+
+
+         JavaScript 中的柯里化函数和绑定函数提供了强大的动态函数创建功能。它们都能用于创建复杂的算法和功能，当然两者都不应滥用，
+         因为每个函数都会带来额外的开销
+         */
+        function curry(fn){
+            var args = Array.prototype.slice.call(arguments, 1);
+            return function(){
+                var innerArgs = Array.prototype.slice.call(arguments);
+                var finalArgs = args.concat(innerArgs);
+                return fn.apply(null, finalArgs);
+            };
+        }
+        function add(num1, num2){
+            //console.log(arguments); //[5,3,callee]
+            return num1 + num2;
+        }
+        var curriedAdd = curry(add, 5);
+        //alert(curriedAdd(3)); //8
+        var curriedAdd = curry(add, 5, 12);
+        //alert(curriedAdd()); //17
+
+        // 义防篡改对象    手工设置每个属性的[[Configurable]]、
+        //[[Writable]]、 [[Enumerable]]、[[Value]]、[[Get]]以及[[Set]]特性，以改变属性的行为
+        //1.  不可扩展对象
+        var person = { name: "Nicholas" };
+        Object.preventExtensions(person);
+        person.age = 29;
+        //alert(person.age); //undefined
+        //alert(Object.isExtensible(person)); //false
+        //2.密封的对象
+        Object.seal(person);//  密封对象不可扩展，且不能删除属性和方法
+        //alert(Object.isSealed(person));//是否被密封  true
+
+        //3.  冻结对象（frozen object）。冻结的对象既不可扩展，又是密封的，而且对象数据属性的[[Writable]]特性会被设置为false。
+        var person = { name: "Nicholas" };
+        Object.freeze(person);
+        person.age = 29;
+        //alert(person.age); //undefined
+        delete person.name;
+        //alert(person.name); //"Nicholas"
+        person.name = "Greg";
+        //alert(person.name); //"Nicholas"
+
+ //  对 JavaScript 库的作者而言，冻结对象是很有用的。因为JavaScript 库最怕有人意外（或有意）地修
+//        改了库中的核心对象。冻结（或密封）主要的库对象能够防止这些问题的发生
+
+
+
+        /* 高级定时器
+        * 定时器对队列的工作方式是，当特定时间过去后将代码插入。注意，给队列添加代码并不意味着对
+         它立刻执行，而只能表示它会尽快执行。设定一个150ms 后执行的定时器不代表到了150ms 代码就立刻
+         执行，它表示代码会在150ms 后被加入到队列中。如果在这个时间点上，队列中没有其他东西，那么这
+         段代码就会被执行，表面上看上去好像代码就在精确指定的时间点上执行了。其他情况下，代码可能明
+         显地等待更长时间才执行。
+        *
+        *
+        * */
+
+        btn.onclick = function(){
+            setTimeout(function(){
+                console.log('clicked my-btn');
+            },1000)
+        };
+        setTimeout(function(){// 优于setInterval(function(){},50)
+            var div = document.getElementById("my-btn");
+            left = parseInt(div.style.left) + 5;
+            div.style.left = left + "px";
+            if (left < 200){
+                setTimeout(arguments.callee, 50);//arguments.callee   :  当函数被调用时，它的arguments.callee对象就会指向自身，也就是一个对自己的引用。
+            }
+        }, 50);
+
+//Yielding Processes
+        /* 当你发现某个循环占用了大量时间  且该处理bu必须同步完成,bu必须按顺序完成
+        那么你就可以
+        使用定时器分割这个循环。这是一种叫做数组分块（array chunking）的技术，小块小块地处理数组，通
+        常每次一小块。基本的思路是为要处理的项目创建一个队列，然后使用定时器取出下一个要处理的项目
+        进行处理，接着再设置另一个定时器。基本的模式如下。 */
+        function chunk(array, process, context){
+            setTimeout(function(){
+                var item = array.shift();
+                process.call(context, item);
+                if (array.length > 0){
+                    setTimeout(arguments.callee, 100);
+                }
+            }, 100);
+        }
+        var data = [12,123,1234,453,436,23,23,5,4123,45,346,5634,2234,345,342];
+        function printValue(item){
+            var div = document.getElementById("my-btn");
+            //div.innerHTML += item + "<br>";
+        }
+        chunk(data,printValue);
+        //必须当心的地方是，传递给chunk()的数组是用作一个队列的，因此当处理数据的同时，数组中的
+        //条目也在改变。如果你想保持原数组不变，则应该将该数组的克隆传递给chunk()，如下例所示：
+        chunk(data.concat(), printValue);
+        //一旦某个函数需要花50ms 以上的时间完成，那么最好看看能否将任务分割为一系列可以使用定时器的小任务。
+
+
+//函数节流
+        /*，某些代码不可以在没有间断的情况连续重复执行。第一次调用函数，
+         创建一个定时器，在指定的时间间隔之后运行代码。当第二次调用该函数时，它会清除前一次的定时器
+         并设置另一个。如果前一个定时器已经执行过了，这个操作就没有任何意义。然而，如果前一个定时器
+         尚未执行，其实就是将其替换为一个新的定时器。目的是只有在执行函数的请求停止了一段时间之后才
+         执行*/
+        function throttle(method, context) {
+            clearTimeout(method.tId);
+            method.tId= setTimeout(function(){
+                method.call(context);
+            }, 100);
+        }
+
+        window.onresize = function(){
+            //var div = document.getElementById("myDiv");
+            //div.style.height = div. offsetWidth + "px";
+        };
+       /* 上面这段非常简单的例子有两个问题可能会造成浏览器运行缓慢。首先，要计算offsetWidth 属性，
+如果该元素或者页面上其他元素有非常复杂的CSS 样式，那么这个过程将会很复杂。其次，设置某个元
+        素的高度需要对页面进行回流来令改动生效。如果页面有很多元素同时应用了相当数量的CSS 的话，这
+        又需要很多计算。这就可以用到throttle()函数，如下例所示：  */
+
+        function resizeDiv(){
+            var div = document.getElementById("myDiv");
+            div.style.height = div.offsetWidth + "px";
+        }
+        window.onresize = function(){
+            throttle(resizeDiv);
+        };
+
+        /* onresize 事件处理
+         程序调用throttle()并传入resizeDiv 函数，而不是直接调用resizeDiv()。多数情况下，用户是
+         感觉不到变化的，虽然给浏览器节省的计算可能会非常大
+         只要代码是周期性执行的，都应该使用节流
+         */
+
+
+        //自定义事件
+        /* 自定义事件背后的概念是创建一个管理事件的对象 */
+
+        function EventTarget(){
+            this.handlers = {};
+        }
+        EventTarget.prototype = {
+            constructor: EventTarget,
+            addHandler: function(type, handler){
+                if (typeof this.handlers[type] == "undefined"){
+                    this.handlers[type] = [];
+                }
+                this.handlers[type].push(handler);
+            },
+            fire: function(event){
+                if (!event.target){
+                    event.target = this;
+                }
+                if (this.handlers[event.type] instanceof Array){
+                    var handlers = this.handlers[event.type];
+                    for (var i=0, len=handlers.length; i < len; i++){
+                        handlers[i](event);
+                    }
+                }
+            },
+            removeHandler: function(type, handler){
+                if (this.handlers[type] instanceof Array){
+                    var handlers = this.handlers[type];
+                    for (var i=0, len=handlers.length; i < len; i++){
+                        if (handlers[i] === handler){
+                            break;
+                        }
+                    }
+                    handlers.splice(i, 1);
+                }
+            }
+        };
+        function handleMessage(event){
+            alert('message received:'+event.message);
+        }
+        var target = new EventTarget();//创建一个新对象
+        target.addHandler('message',handleMessage);//添加一个事件处理程序
+        target.fire({type:'message',message:'hello '}); //触发事件
+        target.removeHandler('message',handleMessage);//删除事件处理程序
+        target.fire({type:'message',message:'hello again '}); //触发事件//再次c触发
+
+        function Person(name, age){
+            EventTarget.call(this);
+            this.name = name;
+            this.age = age;
+        }
+        inheritPrototype(Person,EventTarget);
+        Person.prototype.say = function(message){
+            this.fire({type: "message", message: message});
+        };
+        function handleMessage(event){
+            alert(event.target.name + " says: " + event.message);
+        }
+//创建新person
+        var person = new Person("Nicholas", 29);
+//添加一个事件处理程序
+        person.addHandler("message", handleMessage);
+//在该对象上调用1 个方法，它它触发消息事件
+        //person.say("Hi there."); // Nicholas says: Hi there
+
+        /*原型式寄生组合继承
+        我们的目的是子类原型只继承父类的原型，而不要特权成员，
+        原理其实很简单：创建一个临时的类，让其原型指向父类原型，然后将子类原型指向该临时类的实例即可。实现如下：
+         因为临时类的构造函数是空实现，子类在继承原型时自然不会执行到父类的初始化操作，也不会继承到一堆乱七八糟的特权成员
+         */
+        function inheritPrototype(subClass, superClass) {
+            function Temp() {}
+            Temp.prototype = superClass.prototype;
+            subClass.prototype = new Temp();
+            subClass.prototype.constructor = subClass;
+        }
+
+        //拖放 //
+        //EventUtil.addHandler(document,'mousemove',function(event){
+//            console.log(event);
+//            var myDIv = document.getElementById('my-btn');
+//            myDIv.style.left = event.clientX + 10 +'px';
+//            myDIv.style.top = event.clientY + 10 + 'px';
+       // });
+        var DragDrop = function(){
+            var dragdrop = new EventTarget();
+            dragging = null;
+            diffX = 0;
+            diffY = 0;
+            function handleEvent(event){
+//获取事件和目标
+                event = EventUtil.getEvent(event);
+                var target = EventUtil.getTarget(event);
+//确定事件类型
+                switch(event.type){
+                    case "mousedown"://技巧: 通过css而非JavaScript 脚本来确定可拖动的元素
+                        if (target.className.indexOf("draggable") > -1){
+                            dragging = target;
+                            diffX = event.clientX - target.offsetLeft;
+                            diffY = event.clientY - target.offsetTop;
+                            dragdrop.fire({type:"dragstart",target:dragging,x:event.clientX,y:event.clientY});
+                        }
+                        break;
+                    case "mousemove":
+                        if (dragging !== null){
+//指定位置
+                            dragging.style.left = (event.clientX-diffX) + "px";
+                            dragging.style.top = (event.clientY - diffY)  + "px";
+                            //触发自定义事件
+                            dragdrop.fire({type:'drag',target:dragging,x:event.clientX,y:event.clientY});
+                        }
+                        break;
+                    case "mouseup":
+                        dragdrop.fire({type:'dragend',target:dragging,x:event.clientX,y:event.clientY});
+                        dragging = null;
+                        break;
+                }
+            }
+//公共接口
+           dragdrop.enable=function(){
+                    EventUtil.addHandler(document, "mousedown", handleEvent);
+                    EventUtil.addHandler(document, "mousemove", handleEvent);
+                    EventUtil.addHandler(document, "mouseup", handleEvent);
+                };
+           dragdrop.disable=function(){
+                    EventUtil.removeHandler(document, "mousedown", handleEvent);
+                    EventUtil.removeHandler(document, "mousemove", handleEvent);
+                    EventUtil.removeHandler(document, "mouseup", handleEvent);
+                };
+
+            return dragdrop;
+        }();
+        DragDrop.enable();
+        DragDrop.addHandler("dragstart", function(event){
+            var status = document.getElementById("status");
+            status.innerHTML = "Started dragging " + event.target.id;
+        });
+        DragDrop.addHandler("drag", function(event){
+            var status = document.getElementById("status");
+            status.innerHTML += "<br/> Dragged " + event.target.id + " to (" + event.x +
+                "," + event.y + ")";
+        });
+        DragDrop.addHandler("dragend", function(event){
+            var status = document.getElementById("status");
+            status.innerHTML += "<br/> Dropped " + event.target.id + " at (" + event.x +
+                "," + event.y + ")";
+        });
+
+
+        //最佳实践
+        /*  确认自己代码的可维护性  以便其他开发人员在此基础上更好的开展工作
+        * 直观性——代码中的东西一看就能明白
+          可适应性——代码以一种数据上的变化不要求完全重写的方法撰写。
+          可扩展性——在代码架构上已考虑到在未来允许对核心功能进行扩展
+
+
+         以下是要牢记的应用和业务逻辑之间松散耦合的几条原则：
+          勿将event 对象传给其他方法；只传来自event 对象中所需的数据；
+          任何可以在应用层面的动作都应该可以在不执行任何事件处理程序的情况下进行；
+          任何事件处理程序都应该处理事件，然后将处理转交给应用逻辑。
+         牢记这几条可以在任何代码中都获得极大的可维护性的改进，并且为进一步的测试和开发制造了很
+         多可能。
+
+编程实践：
+         ，如果你不负责创建或维护某个对象、它的对象或者它的方法，那么你就不能对它们进行
+         修改。更具体地说：
+          不要为实例或原型添加属性；
+          不要为实例或原型添加方法；
+          不要重定义已存在的方法。
+         否则会对其他相关的开发人员造成麻烦
+
+
+        * */
+
+        //避免全局变量
+        //两个全局量——避免！！
+       // var name = "Nicholas"; //变量name 覆盖了window.name 属性，可能会与其他功能产生冲突
+//        function sayName(){
+//            alert(name);
+//        }
+
+        //一个全局量——推荐
+        var MyApplication = {
+            name: "Nicholas",
+            sayName: function(){
+                alert(this.name);
+            }
+        };
+
+        /*    避免与null 进行比较
+
+        如果看到了与null 比较的代码，尝试使用以下技术替换：
+     如果值应为一个引用类型，使用instanceof 操作符检查其构造函数；
+     如果值应为一个基本类型，使用typeof 检查其类型；
+     如果是希望对象包含某个特定的方法名，则使用typeof 操作符确保指定名字的方法存在于对
+        象上。
+        */
+
+        //1. 多个变量声明
+/*
+*   //4 个语句——很浪费
+ var count = 5;
+ var color = "blue";
+ var values = [1,2,3];
+ var now = new Date();
+*
+*
+* //一个语句
+ var count = 5,
+ color = "blue",
+ values = [1,2,3],
+ now = new Date();
+ 此处，变量声明只用了一个var 语句，之间由逗号隔开。在大多数情况下这种优化都非常容易做，
+ 并且要比单个变量分别声明快很多。
+
+* */
+
+//还有一个要记住的重要事情: DOM 交互开销很大，所以需要限制DOM 操作的次数。
+
+        //新兴API
+        // 1. requestAnimationFrame()：是一个着眼于优化JavaScript 动画的API，能够在动画运行期间
+        //发出信号。通过这种机制，浏览器就能够自动优化屏幕重绘操作。
+        // 2. page visibility   ：让开发人员知道用户什么时候正在看着页面，而什么时候页面是隐藏
+        //3. geolocation API   在得到许可的情况下，可以确定用户所在的位置。在移动Web 应用中，这个API 非常重要而且常用
+        // 4. File API  可以读取文件内容，用于显示、处理和上传。与HTML5 的拖放功能结合，很容易就能创造出拖放上传功能
+        // 5. web计时   给出了页面加载和渲染过程的很多信息，对性能优化非常有价值。
+                // window.performance
+        // 6.Web Workers    可以运行异步JavaScript 代码，避免阻塞用户界面。在执行复杂计算和数据处理
+        /// 的时候，这个API 非常有用；要不然，这些任务轻则会占用很长时间，重则会导致用户无法与
+        // 页面交互
+
+    }
+</script>
+<script type="text/javascript">
+    var result=document.getElementById("result");
+    var file=document.getElementById("file");
+
+    //判断浏览器是否支持FileReader接口
+    if(typeof FileReader == 'undefined'){
+        result.InnerHTML="<p>你的浏览器不支持FileReader接口！</p>";
+        //使选择控件不可操作
+        file.setAttribute("disabled","disabled");
+    }
+
+    function readAsDataURL(){
+        //检验是否为图像文件
+        var file = document.getElementById("file").files[0];
+        if(!/image\/\w+/.test(file.type)){
+            alert("看清楚，这个需要图片！");
+            return false;
+        }
+        var reader = new FileReader();
+        //将文件以Data URL形式读入页面
+        reader.readAsDataURL(file);
+        reader.onload=function(e){
+            var result=document.getElementById("result");
+            //显示文件
+            result.innerHTML='<img src="' + this.result +'" alt="" />';
+        }
+    }
+
+    function readAsBinaryString(){
+        var file = document.getElementById("file").files[0];
+        var reader = new FileReader();
+        //将文件以二进制形式读入页面
+        reader.readAsBinaryString(file);
+        reader.onload=function(f){
+            var result=document.getElementById("result");
+            //显示文件
+            result.innerHTML=this.result;
+        }
+    }
+
+    function readAsText(){
+        var file = document.getElementById("file").files[0];
+        var reader = new FileReader();
+        //将文件以文本形式读入页面
+        reader.readAsText(file);
+        reader.onload=function(f){
+            var result=document.getElementById("result");
+            //显示文件
+            result.innerHTML=this.result;
+        }
+    }
+</script>
+
+</head>
+<body onload="getData()">
+    <div id="my-btn" class="draggable" style="position:absolute;border:1px solid #2e2e2e;">bbbbbb</div>
+    <div id="my-btn2" class="draggable" style="position:absolute;top:30px;border:1px solid #2e2e2e;">cccccc</div>
+    <p id="status"></p>
+    <div style="width:200px;height:160px;background: url('../image/man.jpg');"></div>
+    <img src="../image/man.jpg" style="width:200px;height:160px;">
+
+    <p>
+        <label>请选择一个文件：</label>
+        <input type="file" id="file" />
+        <input type="button" value="读取图像" onclick="readAsDataURL()" />
+        <input type="button" value="读取二进制数据" onclick="readAsBinaryString()" />
+        <input type="button" value="读取文本文件" onclick="readAsText()" />
+    </p>
+    <div id="result" name="result"></div>
+</body>
+</html>

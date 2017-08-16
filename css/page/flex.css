@@ -1,0 +1,3 @@
+@media (max-width: 768px) {
+    .HolyGrail .HolyGrail-body{display: flex;flex-direction: column;}
+}

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+    <meta name="viewport" id="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta content="black" name="apple-mobile-web-app-status-bar-style" />
+    <meta name="format-detection" content="telephone=no">
+    <title></title>
+    <script>
+        (function(){
+            var scalar = 640, //假设设计稿尺寸按 640 设计   scalar:标量   英 ['skeɪlə]  美 [skelɚ]
+                scale = parseInt(window.screen.width) / scalar;
+            document.getElementById('viewport').setAttribute(
+                'content','target-densitydpi=device-dpi,width=635,use-scalable=no,initial-scale='+scale.toFixed(2));
+        })();
+    </script>
+    <script type="text/javascript">
+        var FE_VERSION = 'v20160712';
+        var pjPath = 'http://' + location.host + '/www/2017framework/';
+        var DOMAIN_CONFIG = {
+            'IMAGE_DOMAIN': pjPath+'image/'
+        };
+    </script>
+    <!---seajs使用出CMD规范   requireJS 遵循的AMD规范 --->
+    <script type="text/javascript" src="../js/reference/sea.js"></script>
+</head>
+<script>
+    function getData(){
+        console.log($('#welcome'));
+    }
+</script>
+</head>
+<body onload="getData()">
+
+</body>
+</html>

@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+    <meta name="viewport" id="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta content="black" name="apple-mobile-web-app-status-bar-style" />
+    <meta name="format-detection" content="telephone=no">
+    <title>离线应用& 客户端存储</title>
+    <script>
+        (function(){
+            var scalar = 640, //假设设计稿尺寸按 640 设计   scalar:标量   英 ['skeɪlə]  美 [skelɚ]
+                scale = parseInt(window.screen.width) / scalar;
+            document.getElementById('viewport').setAttribute('content','target-densitydpi=device-dpi,width=635,use-scalable=no,initial-scale='+scale.toFixed(2));
+        })();
+    </script>
+    <script type="text/javascript">
+        var FE_VERSION = 'v20160712';
+        var pjPath = 'http://' + location.host + '/www/2017framework/';
+        var DOMAIN_CONFIG = {
+            'IMAGE_DOMAIN': pjPath+'image/'
+        };
+    </script>
+    <!---seajs使用出CMD规范   requireJS 遵循的AMD规范 --->
+    <script type="text/javascript" src="../js/reference/sea.js"></script>
+    <script type="text/javascript" src="../js/page/event.js"></script>
+</head>
+<script>
+    function getData(){
+
+        // 离线存储
+        EventUtil.addHandler(window,'online',function(){ //HTML5事件： 从离线变为在线时候触发
+           alert('online');
+           console.log(navigator.onLine);// true
+        });
+        EventUtil.addHandler(window,'offline',function(){ //HTML5事件： 从在线变为离线时候触发
+            alert('offline');
+            console.log(navigator.onLine);// false
+        });
+        // 数据存储 - cookie
+        var CookieUtil = {
+            /*在document.cookie 字符串中查
+             找cookie 名加上等于号的位置。如果找到了，那么使用indexOf()查找该位置之后的第一个分号（表
+             示了该cookie 的结束位置）。如果没有找到分号，则表示该cookie 是字符串中的最后一个，则余下的字
+             符串都是cookie 的值。该值使用decodeURIComponent()进行解码并最后返回。如果没有发现cookie，
+             则返回null。*/
+            get: function (name){
+                var cookieName = encodeURIComponent(name) + "=",
+                    cookieStart = document.cookie.indexOf(cookieName),
+                    cookieValue = null;
+                if (cookieStart > -1){
+                    var cookieEnd = document.cookie.indexOf(";", cookieStart);
+                    if (cookieEnd == -1){
+                        cookieEnd = document.cookie.length;
+                    }
+                    cookieValue = decodeURIComponent(document.cookie.substring(cookieStart
+                        + cookieName.length, cookieEnd));
+                }
+                return cookieValue;
+            },
+            /**cookie，接收如下几个参数：cookie 的名称，cookie 的值，
+             可选的用于指定cookie 何时应被删除的Date 对象，cookie 的可选的URL 路径，可选的域，以及可选的
+             表示是否要添加secure 标志的布尔值。参数是按照它们的使用频率排列的，只有头两个是必需的。在
+             这个方法中，名称和值都使用encodeURIComponent()进行了URL编码，并检查其他选项。如果expires
+             参数是Date 对象，那么会使用Date 对象的toGMTString()方法正确格式化Date 对象，并添加到
+             expires 选项上。方法的其他部分就是构造cookie 字符串并将其设置到document.cookie*/
+            set: function (name, value, expires, path, domain, secure) {
+                var cookieText = encodeURIComponent(name) + "=" +
+                    encodeURIComponent(value);
+                if (expires instanceof Date) {
+                    cookieText += "; expires=" + expires.toGMTString();
+                }
+                if (path) {
+                    cookieText += "; path=" + path;
+                }
+                if (domain) {
+                    cookieText += "; domain=" + domain;
+                }
+                if (secure) {
+                    cookieText += "; secure";
+                }
+                document.cookie = cookieText;
+            },
+            /*没有删除已有cookie 的直接方法。所以，需要使用相同的路径、域和安全选项再次设置cookie，并
+             将失效时间设置为过去的时间。CookieUtil.unset()方法可以处理这种事情。它接收4 个参数：要删
+             除的cookie 的名称、可选的路径参数、可选的域参数和可选的安全参数
+             new Date(0) = 1970 年1 月1 日（初始化为0ms 的Date 对象的值），
+             */
+            unset: function (name, path, domain, secure){
+                this.set(name, "", new Date(0), path, domain, secure);
+            }
+        };
+        CookieUtil.set('name','ffff');
+        console.log(CookieUtil.get('name'));//ffff
+        CookieUtil.unset('name');
+        console.log(CookieUtil.get('name'));//
+        // 子cookie
+        /*  如果你担心开发中可能会达到单域名的cookie 上限，那么子cookie 可是一个非常有吸引力的备选方
+        案。不过，你需要更加密切关注cookie 的长度，以防超过单个cookie 的长度限制
+            子cookie 最常见的的格式如下:name=name1=value1&name2=value2&name3=value3&name4=value4&name5=value5*/
+        var SubCookieUtil = {
+            get: function (name, subName){
+                var subCookies = this.getAll(name);
+                if (subCookies){
+                    return subCookies[subName];
+                } else {
+                    return null;
+                }
+            },
+            getAll: function(name){
+                var cookieName = encodeURIComponent(name) + "=",
+                    cookieStart = document.cookie.indexOf(cookieName),
+                    cookieValue = null,
+                    cookieEnd,
+                    subCookies,
+                    i,
+                    parts,
+                    result = {};
+                if (cookieStart > -1){
+                    cookieEnd = document.cookie.indexOf(";", cookieStart);
+                    if (cookieEnd == -1){
+                        cookieEnd = document.cookie.length;
+                    }
+                    cookieValue = document.cookie.substring(cookieStart +
+                        cookieName.length, cookieEnd);
+                    if (cookieValue.length > 0){
+                        subCookies = cookieValue.split("&");
+                        for (i=0, len=subCookies.length; i < len; i++){
+                            parts = subCookies[i].split("=");
+                            result[decodeURIComponent(parts[0])] =
+                                decodeURIComponent(parts[1]);
+                        }
+                        return result;
+                    }
+                }
+                return null;
+            },
+            set: function (name, subName, value, expires, path, domain, secure) {
+                var subcookies = this.getAll(name) || {};
+                subcookies[subName] = value;
+                this.setAll(name, subcookies, expires, path, domain, secure);
+            },
+            setAll: function(name, subcookies, expires, path, domain, secure){
+                var cookieText = encodeURIComponent(name) + "=",
+                    subcookieParts = new Array(),
+                    subName;
+                for (subName in subcookies){
+                    if (subName.length > 0 && subcookies.hasOwnProperty(subName)){
+                        subcookieParts.push(encodeURIComponent(subName) + "=" +
+                            encodeURIComponent(subcookies[subName]));
+                    }
+                }
+                if (cookieParts.length > 0){
+                    cookieText += subcookieParts.join("&");
+                    if (expires instanceof Date) {
+                        cookieText += "; expires=" + expires.toGMTString();
+                    }
+                    if (path) {
+                        cookieText += "; path=" + path;
+                    }
+                    if (domain) {
+                        cookieText += "; domain=" + domain;
+                    }
+                    if (secure) {
+                        cookieText += "; secure";
+                    }
+                } else {
+                    cookieText += "; expires=" + (new Date(0)).toGMTString();
+                }
+                document.cookie = cookieText;
+            },
+            unset: function (name, subName, path, domain, secure){
+                var subcookies = this.getAll(name);
+                if (subcookies){
+                    delete subcookies[subName];
+                    this.setAll(name, subcookies, null, path, domain, secure);
+                }
+            },
+            unsetAll: function(name, path, domain, secure){
+                this.setAll(name, null, new Date(0), path, domain, secure);
+            }
+        };
+        //假设document.cookie=data=name=Nicholas&book=Professional%20JavaScript
+//设置两个cookie
+        SubCookieUtil.set("data", "name", "Nicholas");
+        SubCookieUtil.set("data", "book", "Professional JavaScript");
+//设置全部子cookie 和失效日期
+        SubCookieUtil.setAll("data", { name: "Nicholas", book: "Professional JavaScript" },
+            new Date("January 1, 2010"));
+//修改名字的值，并修改cookie 的失效日期
+        SubCookieUtil.set("data", "name", "Michael", new Date("February 1, 2010"));
+
+
+        //取得全部子cookie
+        var data = SubCookieUtil.getAll("data");
+        alert(data.name); //"Nicholas"
+        alert(data.book); //"Professional JavaScript"
+//逐个获取子cookie
+        alert(SubCookieUtil.get("data", "name")); //"Nicholas"
+        alert(SubCookieUtil.get("data", "book")); //"Professional JavaScript"
+
+
+        //仅删除名为name 的子cookie
+        SubCookieUtil.unset("data", "name");
+//删除整个cookie
+        SubCookieUtil.unsetAll("data");
+
+
+/* Web存储机制(Storage)
+*  1 . sessionStorage 对象存储特定于某个会话的数据
+*       (Firefox 和WebKit 实现了同步写入  。而IE 的实现则是异步写入数据  )
+*  2.globalStorage 对象   跨越会话存储数据，但有特定的访问限制
+*        //保存数据
+         globalStorage["wrox.com"].name = "Nicholas";
+         //获取数据
+         var name = globalStorage["wrox.com"].name;
+* 3.  localStorage 对象
+*      localStorage对象在新修订过的HTML5规范中取代了 globalStorage
+*       与globalStorage 不同，不能给localStorage 指定任何访问规则；规则事先就
+         设定好了。要访问同一个localStorage 对象，页面必须来自同一个域名（子域名无效），使用同一种
+         协议，在同一个端口上。这相当于globalStorage[location.host]。
+ 为了兼容只支持globalStorage 的浏览器，可以使用以下函数 ：
+* */
+
+
+
+function getLocalStorage(){
+    if (typeof localStorage == "object"){
+        return localStorage;
+    } else if (typeof globalStorage == "object"){
+        return globalStorage[location.host]; // localStorage只能是来自同一个域名，连子域名都ｎｏｔ　ｏｋ
+    } else {
+        throw new Error("Local storage not available.");
+    }
+}
+         //无论对sessionStorage、globalStorage 还是localStorage 进行操作，都会触发storage 事件，但不作区分。
+        EventUtil.addHandler(document,'storage',function(event){
+            alert('storage changed for '+ event.domain);
+        });
+
+        var storage = getLocalStorage();
+        storage.setItem('name','111');
+        console.log(storage.getItem('name'));
+
+
+        /*   IndexedDB
+             IndexedDB就是一个数据库
+         ，与MySQL 或Web SQL Database 等这些你以前可能用过的数据库类似。
+         IndexedDB 最大的特色是使用对象保存数据，而不是使用表来保存数据。一个IndexedDB 数据库，就是
+         一组位于相同命名空间下的对象的集合。
+
+        *  IndexedDB 在IE10 中叫msIndexedDB，在Firefox 4 中叫mozIndexedDB，在Chrome 中叫webkitIndexedDB。为了清楚起见，本节示例中将使用IndexedDB，
+           而实际上每个示例前面都应该加上下面这行代码：
+        *  var indexedDB = window.indexedDB || window.msIndexedDB || window.mozIndexedDB ||
+         window.webkitIndexedDB;
+        * */
+        var indexedDB = window.indexedDB || window.msIndexedDB || window.mozIndexedDB ||
+            window.webkitIndexedDB;
+        var request, database;
+        request = indexedDB.open("admin");
+        request.onerror = function(event){
+            alert("Something bad happened while trying to open: " +
+                event.target.errorCode);
+        };
+        request.onsuccess = function(event){
+            database = event.target.result;
+        };
+        //设置版本号为 1.0  默认情况下，IndexedDB 数据库是没有版本号的，最好一开始就为数据库指定一个版本
+        if (database.version != "1.0"){
+            request = database.setVersion("1.0");
+            request.onerror = function(event){
+                alert("Something bad happened while trying to set version: " +
+                    event.target.errorCode);
+            };
+            request.onsuccess = function(event){
+                alert("Database initialization complete. Database name: " + database.name +
+                    ", Version: " + database.version);
+            };
+        } else {
+            alert("Database already initialized. Database name: " + database.name +
+                ", Version: " + database.version);
+        }
+        var user = {
+            username: "007",
+            firstName: "James",
+            lastName: "Bond",
+            password: "foo"
+        };
+        var store = db.createObjectStore("users", { keyPath: "username" });
+        //可以把这里的对象存储空间（object storge）想象成表，而把其中保存的对象想象成表中的记录
+//users 中保存着一批用户对象
+        var i=0,
+            len = users.length;
+        while(i < len){
+            store.add(users[i++]);
+        }
+        //users 中保存着一批用户对象
+        var i=0,
+            request,
+            requests = [],
+            len = users.length;
+        while(i < len){
+            request = store.add(users[i++]);
+            request.onerror = function(){//处理错误
+            };
+            request.onsuccess = function(){//处理成功
+            };
+            requests.push(request);
+        }
+        // 任何时候，只要想读取或修改数据，都要通过事务来组织所有操作
+        var IDBTransaction = window.IDBTransaction || window.webkitIDBTransaction;
+        var transaction = db.transaction("users");
+        var transaction = db.transaction(["users", "anotherStore"]);
+        var transaction = db.transaction("users", IDBTransaction.READ_WRITE);
+
+
+    }
+</script>
+</head>
+<body onload="getData()">
+
+</body>
+</html>

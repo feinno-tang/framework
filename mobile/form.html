@@ -173,6 +173,8 @@
     function isAppleMobile(){  //判断是否为iphone
         return navigator.platform.indexOf('iPhone')!= -1;
     }
+    // 选择文本  ： 例如新浪微博，点击输入话题按钮，自动生成 #插入话题#，其中插入话题四个字自动选择，方便用户修改话题名称的
+    // 可搜索 js range部分选择文本  还有插件；eg:rangy
 </script>
 </head>
 <body onload="getData()">
@@ -186,5 +188,11 @@
        关掉自动大写：<input type="text" autocapitalize="off" autocorrect="off" placeholder="关掉自动大写">
        自动大写：<input type="text" placeholder="自动大写">
    </div>
+<div>
+    <input type="file" accept="image/*" capture="camera"><hr>
+    <input type="file" accept="video/*" capture="camcorder"><hr>
+    <input type="file" accept="audio/*" capture="microphone"><hr>
+    <input type="file" accept="multiple"><hr>
+</div>
 </body>
 </html>

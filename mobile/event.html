@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>event事件流</title>
+</head>
+<body>
+    <script type="text/javascript">
+        /* 想象一个同心圆，点击圆心，像水波一样，点的不只是圆心，还有其他的所有的圆
+        * */
+        /* 事件流是从页面中接收事件的顺序  IE的事件流是事件冒泡流 event bubbling  而NetSCAPE的事件流是事件捕获流 event capturing
+        * DOM2级事件 规定的事件流包括三个阶段：事件捕获阶段、处于目标阶段和事件冒泡阶段
+        *
+        *大多数情况下，都是将事件处理程序添加到事件流的冒泡阶段，这样可以最大限度地兼容各种浏览
+         器。最好只在需要在事件到达目标之前截获它的时候将事件处理程序添加到捕获阶段。如果不是特别需
+         要，我们不建议在事件捕获阶段注册事件处理程序
+
+
+         1. bind方法
+         　　bind()向匹配元素添加一个或多个事件处理器。
+             使用方式   $(selector).bind(event,data,function)
+              jQuery里 从jquery1.7版本以后bind()函数推荐用on()来代替
+        2. live
+            live() 向当前或未来的匹配元素添加一个或多个事件处理器；
+             jquery1.9及其以上版本删除了此方法，jquery1.9以上版本用on()方法来代替
+        3. delegate()
+            为指定的元素（被选元素的子元素）添加一个或多个事件处理程序，并规定当这些事件发生时运行的函数。使用 delegate() 方法的事件处理程序适用于当前或未来的元素（比如由脚本创建的新元素）。
+             使用方式　
+         　　     $(selector).delegate(childSelector,event,data,function)
+                  childSelector: 必需项；需要添加事件处理程序的元素，一般为selector的子元素；
+                  适用jquery1.4.2及其以上版本；
+
+        4. on()
+           为指定的元素,添加一个或多个事件处理程序，并规定当这些事件发生时运行的函数。使用 on() 方法的事件处理程序适用于当前或未来的元素（比如由脚本创建的新元素）
+            使用方式   $(selector).on(event,childselector,data,function)
+           //删除事件     $(".header").off("click", ".btn-test");
+            jquery1.7及其以上版本；jquery1.7版本出现之后用于替代bind()，live()绑定事件方式；
+
+        * */
+
+    </script>
+    <input type="button" value="click me" onclick="return null;"/>
+    <input type="button" value="event type" onclick="alert(event.type)"/>
+    <input type="button" value="removemomooom" id="btn"/>
+
+    <input type="button" value="click function" onclick="try{showMessage();}catch(ex){}">
+    <form method="post">
+        <input type="text" name="username" value="33">
+        <input type="button" value="Echo Username" onclick="alert(username.value)">
+    </form>
+    <input type="text" id="myText" value="myText">
+    <div >
+        <ul id="myList">
+            <li>11</li>
+            <li>22</li>
+            <li>33</li>
+        </ul>
+    </div>
+    <iframe name="richedit" style="height:500px;width:800px;" src="bdmap.html"></iframe>
+
+    <div id="myDiv">Right click or Ctrl+click me to get a custom context menu.
+        Click anywhere else to get the default context menu.</div>
+    <ul id="myMenu" style="position:absolute;visibility:hidden;background-color:silver">
+        <li><a href="http://www.nczonline.net">Nicholas’ site</a></li>
+        <li><a href="http://www.wrox.com">Wrox site</a></li>
+        <li><a href="http://www.yahoo.com">Yahoo!</a></li>
+    </ul>
+    <script type="text/javascript" src="../js/page/event.js"></script>
+    <script type="text/javascript">
+        var FE_VERSION = 'v20160712';
+        var pjPath = 'http://' + location.host + '/www/2017framework/';
+        var DOMAIN_CONFIG = {
+            'IMAGE_DOMAIN': pjPath+'image/'
+        };
+    </script>
+    <script type="text/javascript" src="../js/reference/sea.js"></script>
+    <script>
+        function showMessage(){
+            alert('hello world!');
+        }
+        /* DOM2级处理方法 */
+        var btn = document.getElementById('btn');
+        var handler = function(){alert(this.id)};
+        btn.addEventListener('click',handler,false);//true ↓ 捕获阶段  false ↑冒泡
+        btn.addEventListener('click',function(){alert('hello world ');},false);
+        btn.removeEventListener('click',handler,false);
+
+        /* IE事件处理 区别     1.事件名称加‘on’,   2. 执行顺序相反,先弹Hello world , 后Clicked  （适用IE8及以下 opera ）*/
+//        var btn = document.getElementById("myBtn");
+//        btn.attachEvent("onclick", function(){
+//            alert("Clicked");
+//        });
+//        btn.attachEvent("onclick", function(){
+//            alert("Hello world!");
+//        });
+
+        /* event 对象的属性和方法
+        * event.bubbles   事件是否冒泡
+        * event.cancelable  是否可以取消事件的默认行为
+        * event.type   被触发的事件的类型
+        * event.target   真正事件的目标
+        * event.currentTarget   绑定事件的目标
+        * event.detail    细节
+        * event.eventPhase  哪个阶段 ：1表示捕获阶段，2表示“处于目标”，3表示冒泡阶段
+        * event.preventDefault()    取消事件的默认行为 如果cancelable是true，则可以使用这个方法
+        *event.stopImmediatePropagation()    取消事件的进一步捕获或冒泡，同时阻止任何 事件处理程序被调用（DOM3级事件中新增）
+        * event.stopPropagation()    取消事件的进一步捕获或冒泡。如果bubbles为true，则可以使用这个方法
+        * event.trusted    为true表示事件是浏览器生成的。为false表示事件是由开发人员通过JavaScript 创建的（DOM3级事件中新增）
+        * event.view       与事件关联的抽象视图。等同于发生事件的window对象
+        *
+        * IE事件处理程序不同的部分：
+        * window.event.cancelBubble   默认值为false，但将其设置为true就可以取消事件冒泡（与DOM中的stopPropagation()方法的作用相同）
+        * window.event.returnValue     默认值为true，但将其设置为false就可以取消事件的默认行为（与DOM中的preventDefault()方法的作用相同）
+        * window.event.srcElement    事件的目标（与DOM中的target属性相同）
+        * window.event.type
+        *
+        *
+        * DOM3级定义了9个鼠标事件
+        * click  (mousedown -》 mouseup)
+        * dbclick
+        * mousedown
+        * mouseenter
+        * mouseleave
+        * mousemove
+        * mouseout
+        * mouseover
+        * mouseup
+        *
+        *
+        *
+        *
+        * 1. 在视口（浏览器窗口）中什么位置
+        *       event.clientX      event.clientY
+        * 2. 在页面中的什么位置
+        *      event.pageX      event.pageY
+        *  3. 相对整个电脑屏幕的位置
+        *      screenX 和screenY
+        *  4. 修改键
+        *     event.shiftKey
+        *      (event.ctrlKey
+        *      (event.altKey
+        *      event.metaKey   Meta（在Windows 键盘中是Windows 键，在苹果机中是Cmd 键）
+        *
+        *
+        * */
+
+    </script>
+    <script>
+        //js事件模拟，举个例子：   ↓
+        var btn = document.querySelector('#myList');
+        btn.addEventListener('click', function (event) {
+            console.log('OH~!You clicked me~!');
+        }, false);
+        var ev = new MouseEvent('click', {
+            cancelable: true,
+            bubble: true,
+            view: window
+        });
+        btn.dispatchEvent(ev);
+        // js事件模拟 ↑ ，不用点击#myList，控制台打印出：'OH~!You clicked me~!
+        //模拟事件跟built-in的事件是一样的， 该bubble还是会bubble, 等等
+        //事件模拟可以用JavaScript在任意时刻fire特定的event， 而不需要等user或者browser来fire。
+    </script>
+    <script>
+        //js自定义事件  ：
+//       第一种： new CustomEvent();  能带数据
+//        第二种：  new Event('build');
+
+        // Listen for the event.
+       // elem.addEventListener('build', function (e) { ... }, false);
+
+        // Dispatch the event.
+         // elem.dispatchEvent(event);
+        // 实际应用中自定义事件： 观察者模式：
+        function EventTarget(){ //创建一个事件管理器。handles是一个存储事件处理函数的对象
+            this.handlers = {};
+        }
+        EventTarget.prototype = {
+            constructor: EventTarget,
+            //         addHandle：是添加事件的方法，该方法接收两个参数，一个是要添加的事件的类型，
+            // 一个是这个事件的回调函数名。调用的时候会首先遍历handles这个对象，
+            // 看看这个类型的方法是否已经存在，如果已经存在则添加到该数组，如果不存在则先创建一个数组然后添加。
+            addHandler: function(type, handler){
+                if (typeof this.handlers[type] == "undefined"){
+                    this.handlers[type] = [];
+                }
+                this.handlers[type].push(handler);
+            },
+            // fire方法：是执行handles这个对象里面的某个类型的每一个方法。
+            fire: function(event){
+                if (!event.target){
+                    event.target = this;
+                }
+                if (this.handlers[event.type] instanceof Array){
+                    var handlers = this.handlers[event.type];
+                    for (var i=0, len=handlers.length; i < len; i++){
+                        handlers[i](event);
+                    }
+                }
+            },
+            //removeHandle：是相应的删除函数的方法。
+            removeHandler: function(type, handler){
+                if (this.handlers[type] instanceof Array){
+                    var handlers = this.handlers[type];
+                    for (var i=0, len=handlers.length; i < len; i++){
+                        if (handlers[i] === handler){
+                            break;
+                        }
+                    }
+                    handlers.splice(i, 1);
+                }
+            }
+        };
+
+    </script>
+    <script>
+        window.onload = function(){
+            EventUtil.addHandler(document.getElementById('myText'), "paste", function(event){
+                event = EventUtil.getEvent(event);
+                var text = EventUtil.getClipboardText(event);
+                alert(text);
+                if (!/^\d*$/.test(text)){
+                    EventUtil.preventDefault(event);
+                }
+            });
+            // 富文本 编辑器核心： 一个设置了 designMode = on 的iframe,
+            frames["richedit"].document.designMode = "on";
+        };
+        // js检测表单元素有效性（如H5 input元素设置了required,如果该元素未输入值，则input元素.checkValidity()是false）
+        document.forms[0].checkValidity();
+        document.forms[0].validity;
+    </script>
+</body>
+</html>
